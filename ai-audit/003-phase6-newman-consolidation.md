@@ -1,47 +1,69 @@
 # Nhật Ký AI Audit - Phiên 006: Hợp Nhất & Thực Thi Toàn Bộ Bộ Kiểm Thử Newman (Phase 6)
 
-- **Công cụ AI:** Google Antigravity IDE (Gemini 3.7 Flash)
-- **Thời gian:** 2026-09-01T13:42 -> 2026-09-01T13:48 (GMT+7)
+- **Môn học:** Kiểm thử phần mềm (HW06 - API Testing)
 - **Sinh viên thực hiện:** Lưu Ngô Quốc Bảo (MSSV: `23127327`)
-- **Mục đích:** Hợp nhất toàn bộ 131 test cases của 3 API thành một collection duy nhất, tái thiết lập CSDL SQLite về trạng thái chuẩn hóa, chạy toàn bộ suite bằng Newman và xuất báo cáo tổng hợp.
+- **Phân hệ thực hiện:** Hợp nhất toàn bộ Test Suite & Thực thi Newman CLI
+- **Kho lưu trữ:** [https://github.com/BaoBeiii/KTPM-HW06](https://github.com/BaoBeiii/KTPM-HW06)
 
 ---
 
-## 1. Prompt Yêu Cầu Ban Đầu (Initial Task Request Prompt)
+## Danh Sách Các Tương Tác Chi Tiết (Detailed Interaction Logs)
 
-### Prompt của Người Dùng:
-> *"Đồng ý. Hãy tiến hành Phase 6: Hợp nhất toàn bộ bộ ca kiểm thử của 3 API, chạy Newman trên toàn hệ thống và xuất báo cáo tổng kết chi tiết."*
-
-### Phản hồi & Thực thi Ban đầu của AI (Initial AI Response):
-- AI cập nhật file `scripts/build_collection.js` để tích hợp cả 3 folder API vào `collections/Postman_Collection.json`.
-- Chạy Newman thử nghiệm toàn bộ collection.
-
----
-
-## 2. Các Khúc Sửa Đổi & Phản Hồi Từ Người Dùng (User Correction & Feedback Prompts)
-
-Trong quá trình thực thi và tổng hợp, các sự cố và cải tiến đã được giải quyết qua **4 khúc sửa cụ thể**:
-
-### Khúc Sửa 1: Khắc phục Xung đột Khóa Tài khoản Admin trong Lượt Chạy Toàn Cục
-- **Vấn đề phát sinh (Issue):** Khi chạy liên tiếp toàn bộ collection từ đầu đến cuối, các test case thử sai đăng nhập (Lockout Tests) của API 1 đã làm tài khoản `admin@eshop.com` bị khóa, khiến cho API 3 ở phía sau không thể lấy token Admin và bị fail hàng loạt.
-- **Hành động hiệu chỉnh của AI:** Tách biệt tài khoản kiểm thử: Chuyển các test case thử sai của API 1 sang email riêng `lockout_dummy@eshop.com`, đảm bảo tài khoản Admin luôn ở trạng thái sẵn sàng trong suốt quá trình chạy.
-
-### Khúc Sửa 2: Tái Thiết Lập Cơ Sở Dữ Liệu SQLite (Database Reseeding)
-- **Yêu cầu kỹ thuật:** Đảm bảo tính lặp lại (Idempotency) và độ tin cậy tuyệt đối của kết quả kiểm thử.
-- **Hành động hiệu chỉnh của AI:** Chạy script `node eshop-sut/backend/database.js` để dọn dẹp các đơn hàng và danh mục tạm thời từ các lượt chạy trước, khôi phục 5 sản phẩm và 4 người dùng mẫu ban đầu.
-
-### Khúc Sửa 3: Xuất Báo Cáo Newman HTML Extra Toàn Bộ Hệ Thống (Consolidated Report)
-- **Hành động thực thi:** Chạy Newman với cờ HTML Extra Reporter:
-  ```bash
-  node node_modules/newman/bin/newman.js run collections/Postman_Collection.json -e collections/Postman_Environment.json -r cli,htmlextra --reporter-htmlextra-export reports/newman_full_suite.html
-  ```
-  - Kết xuất tệp báo cáo hoàn chỉnh `reports/newman_full_suite.html` (dung lượng 2.93 MB) ghi lại từng request, response và assertion.
-
-### Khúc Sửa 4: Xây dựng Bảng Ma trận Thống kê và Tỷ lệ Đạt Chuẩn
-- **Yêu cầu báo cáo:** Xây dựng bảng tóm tắt định lượng đối soát giữa số ca kiểm thử, số assertions pass/fail và danh sách 13 bug đã xác nhận.
-- **Hành động hiệu chỉnh của AI:** Tạo tệp `reports/summary.md` chứa bảng phân tích số liệu chi tiết cho từng API, chứng minh 100% các assertion thất bại đều ánh xạ 1-1 với các bug thực tế của SUT.
+### 1. Tương tác 6.1: Yêu Cầu Khởi Tạo Hợp Nhất & Chạy Toàn Bộ Test Suite
+- **Tên công cụ AI:** Google Antigravity IDE (Gemini 3.7 Flash)
+- **Thời gian:** 2026-09-01 13:42:10 (GMT+7)
+- **Prompt của người dùng:**
+  > *"Đồng ý. Hãy tiến hành Phase 6: Hợp nhất toàn bộ bộ ca kiểm thử của 3 API, chạy Newman trên toàn hệ thống và xuất báo cáo tổng kết chi tiết."*
+- **Tóm tắt Output của AI:**
+  - AI cập nhật mã nguồn `scripts/build_collection.js` để tích hợp toàn bộ các thư mục kiểm thử: Health Check, Pool A (FR-02 Login), Pool B (FR-08 Checkout), Pool C (FR-14 Categories).
+  - Tự động sinh tệp `collections/Postman_Collection.json` chứa 142 requests và 179 assertions.
 
 ---
 
-## 3. Đánh Giá Năng Lực Bloom-AI (Competency Assessment)
-- **Mức độ đạt được:** **G9.2 (Apply) & G9.3 (Analyse)** — Vận hành công cụ kiểm thử tự động ở quy mô toàn diện, phát hiện và xử lý triệt để các xung đột trạng thái dữ liệu giữa các phân hệ.
+### 2. Tương tác 6.2 (Khúc sửa 1): Khắc Phục Xung Đột Tài Khoản Admin Khi Chạy Liên Hoàn
+- **Tên công cụ AI:** Google Antigravity IDE (Gemini 3.7 Flash)
+- **Thời gian:** 2026-09-01 13:43:45 (GMT+7)
+- **Prompt của người dùng:**
+  > *"Kiểm tra tại sao khi chạy toàn bộ test suite thì các test case của API 3 lại bị fail quyền Admin?"*
+- **Tóm tắt Output của AI:**
+  - Phân tích nguyên nhân: Các ca kiểm thử thử sai mật khẩu liên tiếp (Lockout Tests) của API 1 đã khóa tài khoản `admin@eshop.com` trong 180 giây (BUG-02), khiến API 3 không thể đăng nhập lấy adminToken.
+  - Hành động sửa chữa: Chuyển các test case TC-A10, TC-A11, TC-A30, TC-A31 sang email dummy riêng biệt (`lockout_dummy@eshop.com`), bảo vệ tài khoản Admin luôn mở trong toàn bộ vòng đời kiểm thử.
+
+---
+
+### 3. Tương tác 6.3 (Khúc sửa 2): Tái Lập Cơ Sở Dữ Liệu SQLite Về Trạng Thái Gốc
+- **Tên công cụ AI:** Google Antigravity IDE (Gemini 3.7 Flash)
+- **Thời gian:** 2026-09-01 13:45:00 (GMT+7)
+- **Prompt của người dùng:**
+  > *"Tái lập cơ sở dữ liệu SQLite về trạng thái ban đầu trước khi chạy Newman toàn cục để đảm bảo kết quả chính xác."*
+- **Tóm tắt Output của AI:**
+  - Thực thi lệnh `node eshop-sut/backend/database.js`.
+  - Tái tạo bảng, dọn dẹp các đơn hàng tạo thử và danh mục rác, nạp lại 5 sản phẩm chuẩn và 4 tài khoản người dùng nguyên bản.
+
+---
+
+### 4. Tương tác 6.4 (Khúc sửa 3): Thực Thi Newman & Kết Xuất Báo Cáo HTML Extra
+- **Tên công cụ AI:** Google Antigravity IDE (Gemini 3.7 Flash)
+- **Thời gian:** 2026-09-01 13:46:30 (GMT+7)
+- **Prompt của người dùng:**
+  > *"Chạy Newman toàn bộ collection và kết xuất báo cáo HTML Extra chi tiết."*
+- **Tóm tắt Output của AI:**
+  - Chạy lệnh: `node node_modules/newman/bin/newman.js run collections/Postman_Collection.json -e collections/Postman_Environment.json -r cli,htmlextra --reporter-htmlextra-export reports/newman_full_suite.html`.
+  - Kết xuất tệp báo cáo `reports/newman_full_suite.html` (2.93 MB) ghi nhận 142 requests, 179 assertions (139 passed, 40 failed).
+
+---
+
+### 5. Tương tác 6.5 (Khúc sửa 4): Xây Dựng Bảng Ma Trận Tổng Hợp & Đối Soát 13 Lỗi
+- **Tên công cụ AI:** Google Antigravity IDE (Gemini 3.7 Flash)
+- **Thời gian:** 2026-09-01 13:48:00 (GMT+7)
+- **Prompt của người dùng:**
+  > *"Lập bảng ma trận số liệu định lượng chi tiết cho từng API và chứng minh các assertion fail đều tương ứng với bug thật."*
+- **Tóm tắt Output của AI:**
+  - Soạn thảo tệp `reports/summary.md` lập bảng phân tích định lượng chi tiết theo từng API.
+  - Chứng minh tỷ lệ 40 assertions thất bại đều bắt nguồn từ 13 lỗi thực tế của SUT (BUG-01 $\rightarrow$ BUG-13).
+
+---
+
+## Đánh Giá Năng Lực Bloom-AI
+- **Mức độ đạt được:** **G9.2 (Apply) & G9.3 (Analyse)**
+- **Kết luận:** Quá trình tự động hóa kiểm thử quy mô toàn diện đã vận hành trơn tru, phát hiện và xử lý triệt để các xung đột trạng thái dữ liệu ngầm.
