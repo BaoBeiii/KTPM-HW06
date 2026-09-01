@@ -78,3 +78,63 @@
   1. Gửi request `POST /api/login` với body: `{"email": "TEST@ESHOP.COM", "password": "Test1234!"}`.
 - **Kết quả thực tế (Actual Result):** Trả về `401 Unauthorized` (`Invalid email or password`).
 - **Kết quả mong đợi (Expected Result):** Đăng nhập thành công `200 OK`.
+
+---
+
+### BUG-05: Lỗ hổng Price Tampering nghiêm trọng — Backend không tự tính toán lại tổng tiền giỏ hàng
+- **Mã lỗi:** `BUG-05`
+- **API bị ảnh hưởng:** `POST /api/checkout` (FR-08)
+- **Mức độ nghiêm trọng:** `Critical (Business Logic Flaw)`
+- **Mô tả:** Theo đặc tả FR-08: "Backend phải tự tính lại tổng tiền; không chấp nhận giá trị total_amount do client gửi lên". Tuy nhiên, endpoint `/api/checkout` nhận trực tiếp giá trị `total_amount` từ request body và ghi thẳng vào database, cho phép khách hàng mua sản phẩm trị giá hàng chục triệu đồng với giá 1,000đ hoặc 0đ.
+- **Nguyên nhân kỹ thuật:** Trong file `server.js` (dòng 299 & 302), mã nguồn trích xuất `const { total_amount, shipping_address } = req.body;` và thực thi câu lệnh SQL: `INSERT INTO orders (user_id, total_amount, status, shipping_address) VALUES (?, ?, ?, ?)`, trong đó `total_amount` được lấy trực tiếp từ client mà không hề duyệt qua `userCarts[userId]` để tính tổng tiền theo giá sản phẩm thực tế.
+- **Các bước tái hiện (Steps to Reproduce):**
+  1. Thêm 1 sản phẩm đắt tiền (ví dụ: iPhone 15 Pro Max giá 30,000,000đ) vào giỏ qua `POST /api/cart`.
+  2. Gửi request `POST /api/checkout` với body bị sửa đổi: `{"total_amount": 1000, "shipping_address": "123 Le Loi"}`.
+- **Kết quả thực tế (Actual Result):** Hệ thống trả về `200 OK` (`{"message": "Checkout successful", "orderId": X}`) và tạo đơn hàng với tổng tiền chỉ 1,000đ.
+- **Kết quả mong đợi (Expected Result):** Backend phải tự tính lại tổng tiền là 30,000,000đ, hoặc từ chối request nếu số tiền client gửi không khớp với tính toán nội bộ.
+
+---
+
+### BUG-06: Giỏ hàng không được làm rỗng sau khi thanh toán thành công
+- **Mã lỗi:** `BUG-06`
+- **API bị ảnh hưởng:** `POST /api/checkout` (FR-08)
+- **Mức độ nghiêm trọng:** `Major (State Management Bug)`
+- **Mô tả:** Theo đặc tả FR-08: "Sau thanh toán thành công, giỏ hàng được xóa". Tuy nhiên, trong thực tế sau khi tạo đơn hàng thành công, giỏ hàng của người dùng vẫn giữ nguyên toàn bộ sản phẩm cũ.
+- **Nguyên nhân kỹ thuật:** Trong hàm xử lý `app.post("/api/checkout", ...)` tại `server.js` (dòng 297-309), hoàn toàn không có dòng lệnh nào thực hiện reset hoặc xóa `userCarts[userId] = []`.
+- **Các bước tái hiện (Steps to Reproduce):**
+  1. Thêm sản phẩm vào giỏ bằng `POST /api/cart`.
+  2. Gọi `POST /api/checkout` $\rightarrow$ Nhận phản hồi 200 OK Checkout successful.
+  3. Gọi `GET /api/cart` để kiểm tra trạng thái giỏ hàng.
+- **Kết quả thực tế (Actual Result):** `GET /api/cart` vẫn trả về danh sách các sản phẩm cũ vừa mua.
+- **Kết quả mong đợi (Expected Result):** `GET /api/cart` phải trả về mảng rỗng `[]` (hoặc `{cart: []}`).
+
+---
+
+### BUG-07: Cho phép đặt hàng thành công khi giỏ hàng rỗng
+- **Mã lỗi:** `BUG-07`
+- **API bị ảnh hưởng:** `POST /api/checkout` (FR-08)
+- **Mức độ nghiêm trọng:** `Major (Business Logic Flaw)`
+- **Mô tả:** Người dùng chưa thêm bất kỳ sản phẩm nào vào giỏ (`userCarts` rỗng) vẫn có thể gửi request `POST /api/checkout` và tạo đơn hàng thành công.
+- **Nguyên nhân kỹ thuật:** Endpoint `/api/checkout` không kiểm tra độ dài mảng `userCarts[userId]` trước khi thực hiện câu lệnh INSERT INTO orders.
+- **Các bước tái hiện (Steps to Reproduce):**
+  1. Đăng nhập tài khoản mới chưa có giỏ hàng.
+  2. Gửi request `POST /api/checkout` với body: `{"total_amount": 200000, "shipping_address": "123 Le Loi"}`.
+- **Kết quả thực tế (Actual Result):** Hệ thống trả về `200 OK` và tạo đơn hàng rỗng không sản phẩm trong database.
+- **Kết quả mong đợi (Expected Result):** Hệ thống phải trả về `400 Bad Request` với thông báo lỗi giỏ hàng rỗng.
+
+---
+
+### BUG-08: Thiếu hoàn toàn Validation dữ liệu đầu vào trên Endpoint Checkout
+- **Mã lỗi:** `BUG-08`
+- **API bị ảnh hưởng:** `POST /api/checkout` (FR-08)
+- **Mức độ nghiêm trọng:** `Major (Input Validation Flaw)`
+- **Mô tả:** Endpoint `/api/checkout` không thực hiện bất kỳ kiểm tra hợp lệ nào đối với các trường trong request body. Hệ thống chấp nhận:
+  - `total_amount` âm (ví dụ: `-50000`), bằng 0, null, boolean, hoặc chuỗi chữ.
+  - `shipping_address` là chuỗi rỗng `""`, null, toàn khoảng trắng, hoặc kiểu số.
+  - Body rỗng `{}`.
+- **Nguyên nhân kỹ thuật:** Mã nguồn không có middleware hoặc điều kiện `if (!total_amount || !shipping_address)` để validate dữ liệu đầu vào.
+- **Các bước tái hiện (Steps to Reproduce):**
+  1. Gửi request `POST /api/checkout` với `{"total_amount": -50000, "shipping_address": ""}`.
+- **Kết quả thực tế (Actual Result):** Trả về `200 OK` và lưu giá trị âm cùng địa chỉ rỗng vào CSDL.
+- **Kết quả mong đợi (Expected Result):** Trả về `400 Bad Request` với thông báo lỗi cụ thể cho từng trường không hợp lệ.
+

@@ -76,3 +76,72 @@ Dưới đây là **6 ca kiểm thử chuyên sâu** do con người bổ sung m
 - **Số ca kiểm thử được thẩm định:** 38 ca kiểm thử (36 VALID, 2 INCOMPLETE được hiệu chỉnh)
 - **Số ca kiểm thử mở rộng bởi con người:** 6 ca kiểm thử
 - **Tổng số ca kiểm thử thực thi cho API 1:** **44 ca kiểm thử**
+
+---
+
+# 2. API 2: FR-08 Đặt Hàng / Thanh Toán (`POST /api/checkout`)
+
+## 2.1. Tập Ca Kiểm Thử Sinh Bởi AI (AI-Generated Test Cases) & Kết Quả Thẩm Định (Human Audit)
+
+| Test ID | Phân loại | Tên ca kiểm thử | Dữ liệu đầu vào (Request Body & Headers) | Kỳ vọng theo Đặc tả (Expected Result) | Thẩm định (Human Audit) | Lý do & Hiệu chỉnh (Reasoning & Correction) |
+| :--- | :--- | :--- | :--- | :--- | :---: | :--- |
+| **TC-B01** | Domain (Valid) | Checkout thành công với giỏ hàng có sản phẩm | `{"total_amount": 30000000, "shipping_address": "123 Le Loi, Q1, TP.HCM"}` | 200 OK, `message: "Checkout successful"`, `orderId` là số nguyên dương | **VALID** | Phù hợp mục 4.3 đặc tả API khi người dùng đã có hàng trong giỏ. |
+| **TC-B02** | Domain (Valid) | `total_amount` là số nguyên dương hợp lệ | `{"total_amount": 200000, "shipping_address": "456 Nguyen Hue, Q1"}` | 200 OK | **VALID** | Kiểm tra phân vùng giá trị dương hợp lệ. |
+| **TC-B03** | Domain (Boundary) | `total_amount` là số thực dấu phẩy động (float) | `{"total_amount": 199999.5, "shipping_address": "123 Le Loi"}` | 200 OK hoặc 400 Bad Request | **VALID** | Kiểm tra xử lý kiểu số thực trong tiền tệ VND (không có đơn vị xu lẻ). |
+| **TC-B04** | Domain (Boundary) | `total_amount` bằng 0 | `{"total_amount": 0, "shipping_address": "123 Le Loi"}` | 400 Bad Request | **VALID** | Đơn hàng không thể có giá trị bằng 0 khi có sản phẩm. |
+| **TC-B05** | Domain (Invalid) | `total_amount` là số âm | `{"total_amount": -50000, "shipping_address": "123 Le Loi"}` | 400 Bad Request | **VALID** | Tổng tiền thanh toán không được phép âm. |
+| **TC-B06** | Domain (Invalid) | `total_amount` là chuỗi số (`"200000"`) | `{"total_amount": "200000", "shipping_address": "123 Le Loi"}` | 200 OK (nếu ép kiểu) hoặc 400 | **INCOMPLETE** | AI kỳ vọng 200. Hiệu chỉnh: Cần xác thực backend có ép kiểu an toàn hay từ chối strict type. |
+| **TC-B07** | Domain (Invalid) | `total_amount` là chuỗi chữ | `{"total_amount": "hai trăm nghìn", "shipping_address": "123 Le Loi"}` | 400 Bad Request | **VALID** | Chuỗi chữ không thể parse thành số tiền. |
+| **TC-B08** | Domain (Invalid) | `total_amount` là kiểu boolean `true` | `{"total_amount": true, "shipping_address": "123 Le Loi"}` | 400 Bad Request | **VALID** | Ngăn chặn Type Juggling / Coercion trong Javascript. |
+| **TC-B09** | Domain (Invalid) | `total_amount` nhận giá trị `null` | `{"total_amount": null, "shipping_address": "123 Le Loi"}` | 400 Bad Request | **VALID** | Trường tổng tiền bắt buộc, không được null. |
+| **TC-B10** | Boundary (Extreme) | `total_amount` là số cực lớn ($10^{12}$) | `{"total_amount": 1000000000000, "shipping_address": "123 Le Loi"}` | 400 Bad Request hoặc 200 OK | **VALID** | Kiểm tra tràn số nguyên (Integer Overflow) trong SQLite. |
+| **TC-B11** | Domain (Boundary) | Thiếu trường `total_amount` trong body | `{"shipping_address": "123 Le Loi"}` | 400 Bad Request | **VALID** | Thiếu trường bắt buộc theo đặc tả schema. |
+| **TC-B12** | Domain (Valid) | `shipping_address` địa chỉ tiêu chuẩn | `{"total_amount": 200000, "shipping_address": "Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội"}` | 200 OK | **VALID** | Phân vùng địa chỉ hợp lệ. |
+| **TC-B13** | Domain (Boundary) | `shipping_address` là chuỗi rỗng `""` | `{"total_amount": 200000, "shipping_address": ""}` | 400 Bad Request | **VALID** | Địa chỉ giao hàng không được phép để rỗng. |
+| **TC-B14** | Domain (Boundary) | `shipping_address` chỉ chứa khoảng trắng `"   "` | `{"total_amount": 200000, "shipping_address": "   "}` | 400 Bad Request | **VALID** | Không chấp nhận địa chỉ vô nghĩa gồm toàn dấu cách. |
+| **TC-B15** | Domain (Invalid) | `shipping_address` nhận giá trị `null` | `{"total_amount": 200000, "shipping_address": null}` | 400 Bad Request | **VALID** | Bắt buộc kiểu dữ liệu string cho địa chỉ. |
+| **TC-B16** | Domain (Invalid) | `shipping_address` là kiểu số `12345` | `{"total_amount": 200000, "shipping_address": 12345}` | 400 Bad Request | **VALID** | Sai kiểu dữ liệu trường địa chỉ. |
+| **TC-B17** | Boundary (Length) | `shipping_address` độ dài tối thiểu 1 ký tự (`"A"`) | `{"total_amount": 200000, "shipping_address": "A"}` | 400 Bad Request | **VALID** | Địa chỉ 1 ký tự không đủ cấu trúc giao hàng hợp lệ. |
+| **TC-B18** | Boundary (Length) | `shipping_address` cực dài (1000 ký tự) | `{"total_amount": 200000, "shipping_address": "X".repeat(1000)}` | 400 Bad Request hoặc 200 OK | **VALID** | Kiểm tra giới hạn độ dài trường TEXT trong CSDL. |
+| **TC-B19** | Domain (Format) | `shipping_address` chứa tiếng Việt có dấu Unicode đầy đủ | `{"total_amount": 200000, "shipping_address": "123 Đường Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh"}` | 200 OK | **VALID** | Hỗ trợ ký tự tiếng Việt UTF-8 chuẩn. |
+| **TC-B20** | Domain (Boundary) | Thiếu trường `shipping_address` trong body | `{"total_amount": 200000}` | 400 Bad Request | **VALID** | Không thể giao hàng nếu thiếu địa chỉ. |
+| **TC-B21** | Domain (Boundary) | Body rỗng hoàn toàn `{}` | `{}` | 400 Bad Request | **VALID** | Thiếu toàn bộ thông tin thanh toán. |
+| **TC-B22** | Domain (Security) | Client gửi kèm trường thừa `status: "delivered"` | `{"total_amount": 200000, "shipping_address": "123 Le Loi", "status": "delivered"}` | 200 OK, nhưng trạng thái đơn tạo ra trong DB bắt buộc phải là `pending` | **INCOMPLETE** | AI ban đầu chỉ assert status 200. Hiệu chỉnh: Bắt buộc gọi `GET /api/orders/my-orders` để kiểm tra đơn hàng không bị client gán đè `status: delivered` (Mass Assignment Vulnerability). |
+| **TC-B23** | State (Cart) | Checkout khi giỏ hàng RỖNG (`userCarts = []`) | `{"total_amount": 200000, "shipping_address": "123 Le Loi"}` | 400 Bad Request ("Giỏ hàng rỗng không thể thanh toán") | **VALID** | Ràng buộc nghiệp vụ FR-08: không thể tạo đơn khi giỏ rỗng. |
+| **TC-B24** | State (Cart) | Nạp 1 sản phẩm vào giỏ $\rightarrow$ Thực hiện Checkout | `{"total_amount": 30000000, "shipping_address": "123 Le Loi"}` | 200 OK, tạo đơn thành công | **VALID** | Luồng chuẩn đặt hàng với 1 item. |
+| **TC-B25** | State (Cart) | Xác minh giỏ hàng bị XÓA SẠCH sau khi Checkout thành công | Gọi `GET /api/cart` ngay sau khi `POST /api/checkout` | 200 OK, trả về mảng rỗng `[]` | **VALID** | Ràng buộc rõ ràng trong FR-08: "Sau thanh toán thành công, giỏ hàng được xóa". |
+| **TC-B26** | State (Order) | Xác minh trạng thái ban đầu của đơn hàng mới tạo là `pending` | Gọi `GET /api/orders/my-orders` kiểm tra đơn mới nhất | Đơn hàng có `status === "pending"` | **VALID** | Khớp sơ đồ State Machine FR-10: trạng thái khởi đầu luôn là `pending`. |
+| **TC-B27** | State (Cart) | Nạp nhiều sản phẩm khác nhau vào giỏ $\rightarrow$ Checkout | `{"total_amount": 75000000, "shipping_address": "123 Le Loi"}` | 200 OK | **VALID** | Luồng đặt hàng với nhiều mặt hàng. |
+| **TC-B28** | State (Order) | Đơn hàng mới tạo phải liên kết đúng `user_id` của Token | Gọi `GET /api/orders/my-orders` | `order.user_id === user.id` | **VALID** | Đảm bảo tính toàn vẹn và phân tách dữ liệu người dùng. |
+| **TC-B29** | Security (SEC-02) | Request không gửi Header `Authorization` (Unauthenticated) | Không có Authorization header | 401 Unauthorized | **VALID** | Ràng buộc SEC-02: Bắt buộc có token JWT hợp lệ. |
+| **TC-B30** | Security (SEC-02) | Token JWT sai định dạng hoặc chữ ký giả mạo | `Authorization: Bearer invalid_jwt_token_123` | 403 Forbidden | **VALID** | Kiểm tra xác thực chữ ký số JWT. |
+| **TC-B31** | Security (SEC-02) | Token JWT rỗng (`Bearer `) | `Authorization: Bearer ` | 401 Unauthorized hoặc 403 | **VALID** | Xử lý header Authorization rỗng. |
+| **TC-B32** | Security (SEC-04) | Stored XSS trong trường `shipping_address` (`<script>`) | `{"total_amount": 200000, "shipping_address": "<script>alert('XSS')</script>"}` | Dữ liệu phải được sanitize hoặc escape, không lưu script thực thi | **VALID** | Tuân thủ yêu cầu SEC-04: escape dữ liệu người dùng. |
+| **TC-B33** | Security (SEC-04) | HTML Tag Injection trong `shipping_address` | `{"total_amount": 200000, "shipping_address": "<img src=x onerror=alert(1)>"}` | Được sanitize an toàn | **VALID** | Phòng thủ vector tấn công HTML event injection. |
+| **TC-B34** | Security (SEC-05) | SQL Injection trong trường `shipping_address` | `{"total_amount": 200000, "shipping_address": "123 Le Loi', 'delivered'); --"}` | 400 Bad Request hoặc chuỗi được escape trong Parameterized query | **VALID** | Bắt buộc kiểm tra Parameterized Query theo SEC-05. |
+| **TC-B35** | Security (Business) | Lỗ hổng Price Tampering: Client gửi giá rẻ hơn giá trị thực trong giỏ | `{"total_amount": 1000, "shipping_address": "123 Le Loi"}` (Giỏ hàng có SP 30,000,000đ) | Backend phải tự tính lại tổng tiền = 30,000,000đ hoặc từ chối request | **VALID** | Ràng buộc then chốt của FR-08: "Backend phải tự tính lại tổng tiền; không chấp nhận giá trị total_amount do client gửi lên". |
+| **TC-B36** | Schema (Response) | Kiểm định cấu trúc response thành công của API Checkout | `{"total_amount": 200000, "shipping_address": "123 Le Loi"}` | Response chứa đúng 2 trường: `message: "Checkout successful"` và `orderId` (number) | **VALID** | Khớp 100% schema mục 4.3 đặc tả API. |
+
+---
+
+## 2.2. Các Ca Kiểm Thử Mở Rộng Do Con Người Thiết Kế (Human Extensions)
+
+Dưới đây là **6 ca kiểm thử chuyên sâu** do con người bổ sung mà AI ban đầu bỏ sót:
+
+| Test ID | Tên ca kiểm thử mở rộng | Request Body / Kịch bản thực thi | Kết quả mong đợi theo Đặc tả | Lý do AI bỏ sót (Why AI Missed It) |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-EXT-07** | Price Tampering với số tiền bằng 0 (Free Order Exploit) | Nạp sản phẩm 30tr vào giỏ $\rightarrow$ Gửi `total_amount = 0` | Backend từ chối đơn hàng 0đ hoặc tự tính lại 30tr, tuyệt đối không tạo đơn 0đ. | **AI bỏ sót lỗ hổng gian lận logic:** AI thường chỉ kiểm tra số dương ngẫu nhiên, bỏ sót kịch bản kẻ tấn công cố tình mua hàng miễn phí bằng cách gửi 0đ. |
+| **TC-EXT-08** | Kiểm tra tính toàn vẹn trạng thái giỏ hàng (Cart State Persistence Check) | Chuỗi 3 requests liên hoàn: `POST /api/cart` $\rightarrow$ `POST /api/checkout` $\rightarrow$ `GET /api/cart` | Giỏ hàng sau checkout phải có độ dài mảng bằng đúng 0 (`length === 0`). | **Hạn chế kiểm thử đơn lẻ của AI:** AI chỉ thiết kế request checkout độc lập, không xâu chuỗi kịch bản gọi lại API giỏ hàng để xác nhận trạng thái dữ liệu đã bị xóa. |
+| **TC-EXT-09** | BOLA / IDOR: Giả mạo `user_id` trong body checkout | Gửi `{"user_id": 9999, "total_amount": 200000, "shipping_address": "123 Le Loi"}` | Đơn hàng tạo ra phải luôn thuộc về `req.user.id` từ JWT Token, không bị gán cho user 9999. | **AI thiếu tư duy phòng thủ tham số thừa:** AI không lường trước việc client cố tình chèn thêm ID của người khác để tạo đơn nặc danh. |
+| **TC-EXT-10** | Kiểm tra XSS khi đọc lại đơn hàng (Stored XSS Retrieval Check) | Gửi `shipping_address` chứa XSS payload $\rightarrow$ Gọi `GET /api/orders/my-orders` | Dữ liệu trả về không bị trigger script hoặc đã được mã hóa an toàn. | **AI thiếu kiểm thử vòng đời dữ liệu (Lifecycle verification):** AI chỉ kiểm tra lúc gửi vào (Input), không kiểm tra lúc dữ liệu được đọc ra và hiển thị (Output). |
+| **TC-EXT-11** | Kiểm tra xử lý Content-Type không hợp lệ | Gửi request checkout với Content-Type `application/x-www-form-urlencoded` | 400 Bad Request hoặc 415 Unsupported Media Type. | **AI mặc định môi trường chuẩn:** AI giả định client luôn luôn gửi `application/json`. |
+| **TC-EXT-12** | Race Condition: Gửi 2 request Checkout liên tiếp cực nhanh cùng lúc | Gửi 2 request checkout gần như đồng thời trên cùng 1 giỏ hàng có 1 sản phẩm | Chỉ 1 đơn hàng được tạo thành công, request thứ hai phải bị từ chối vì giỏ hàng đã được xóa. | **AI thiếu kiểm thử tương tranh (Concurrency Testing):** AI chỉ sinh các ca kiểm thử tuần tự đơn luồng. |
+
+---
+
+## 2.3. Tổng Kết Số Lượng Ca Kiểm Thử API 2:
+- **Số ca kiểm thử do AI sinh ra:** 36 ca kiểm thử
+- **Số ca kiểm thử được thẩm định:** 36 ca kiểm thử (34 VALID, 2 INCOMPLETE được hiệu chỉnh)
+- **Số ca kiểm thử mở rộng bởi con người:** 6 ca kiểm thử
+- **Tổng số ca kiểm thử thực thi cho API 2:** **42 ca kiểm thử**
+

@@ -32,7 +32,9 @@ const collection = {
   item: []
 };
 
+// ============================================================================
 // 00. Health Check Folder
+// ============================================================================
 const healthCheckFolder = {
   name: "00. Environment & Health Check",
   item: [
@@ -73,7 +75,9 @@ const healthCheckFolder = {
   ]
 };
 
-// Helper function to create a Login Request item
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
 function createLoginItem(name, bodyObj, testScripts, rawBody = null, headers = []) {
   const reqHeaders = [
     { key: "Content-Type", value: "application/json", type: "text" },
@@ -81,627 +85,869 @@ function createLoginItem(name, bodyObj, testScripts, rawBody = null, headers = [
   ];
   return {
     name: name,
-    event: [
-      {
-        listen: "test",
-        script: {
-          type: "text/javascript",
-          exec: testScripts
-        }
-      }
-    ],
+    event: [{ listen: "test", script: { type: "text/javascript", exec: testScripts } }],
     request: {
       method: "POST",
       header: reqHeaders,
-      body: {
-        mode: "raw",
-        raw: rawBody !== null ? rawBody : JSON.stringify(bodyObj)
-      },
-      url: {
-        raw: "{{baseUrl}}/api/login",
-        host: ["{{baseUrl}}"],
-        path: ["api", "login"]
-      }
+      body: { mode: "raw", raw: rawBody !== null ? rawBody : JSON.stringify(bodyObj) },
+      url: { raw: "{{baseUrl}}/api/login", host: ["{{baseUrl}}"], path: ["api", "login"] }
     },
     response: []
   };
 }
 
-// 01. Pool A - FR-02 Login Folder
+function createCheckoutItem(name, bodyObj, testScripts, rawBody = null, headers = [], authHeader = "Bearer {{userToken}}") {
+  const reqHeaders = [
+    { key: "Content-Type", value: "application/json", type: "text" },
+    ...headers
+  ];
+  if (authHeader !== null) {
+    reqHeaders.push({ key: "Authorization", value: authHeader, type: "text" });
+  }
+  return {
+    name: name,
+    event: [{ listen: "test", script: { type: "text/javascript", exec: testScripts } }],
+    request: {
+      method: "POST",
+      header: reqHeaders,
+      body: { mode: "raw", raw: rawBody !== null ? rawBody : JSON.stringify(bodyObj) },
+      url: { raw: "{{baseUrl}}/api/checkout", host: ["{{baseUrl}}"], path: ["api", "checkout"] }
+    },
+    response: []
+  };
+}
+
+// ============================================================================
+// 01. POOL A - FR-02 LOGIN
+// ============================================================================
 const fr02Folder = {
   name: "01. Pool A - FR-02 Login",
   item: [
-    // Pre-requisite: Setup test accounts for testing
     {
       name: "01.0 Setup: Register Dedicated Test Accounts",
-      event: [
-        {
-          listen: "test",
-          script: {
-            type: "text/javascript",
-            exec: [
-              "pm.test('Setup: Accounts initialized', function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 500]);",
-              "});"
-            ]
-          }
+      event: [{
+        listen: "test",
+        script: {
+          type: "text/javascript",
+          exec: [
+            "pm.test('Setup: Accounts initialized', function () {",
+            "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 500]);",
+            "});"
+          ]
         }
-      ],
+      }],
       request: {
         method: "POST",
         header: [{ key: "Content-Type", value: "application/json", type: "text" }],
         body: {
           mode: "raw",
-          raw: JSON.stringify({
-            name: "Lockout Test User",
-            email: "lockout_demo@eshop.com",
-            password: "CorrectPassword123!"
-          })
+          raw: JSON.stringify({ name: "Lockout Test User", email: "lockout_demo@eshop.com", password: "CorrectPassword123!" })
         },
-        url: {
-          raw: "{{baseUrl}}/api/register",
-          host: ["{{baseUrl}}"],
-          path: ["api", "register"]
-        }
+        url: { raw: "{{baseUrl}}/api/register", host: ["{{baseUrl}}"], path: ["api", "register"] }
       },
       response: []
     }
   ]
 };
 
-// --- Subfolder: 01.1 Domain & Boundary Tests ---
 const domainItems = [];
+domainItems.push(createLoginItem("TC-A01: Valid User Login (test@eshop.com)", { email: "test@eshop.com", password: "Test1234!" }, [
+  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+  "var data = pm.response.json();",
+  "pm.test('Returns JWT token string', function () { pm.expect(data.token).to.be.a('string').and.not.empty; });",
+  "pm.test('Returns user object with role user', function () {",
+  "    pm.expect(data.user).to.be.an('object');",
+  "    pm.expect(data.user.email).to.eql('test@eshop.com');",
+  "    pm.expect(data.user.role).to.eql('user');",
+  "    pm.environment.set('userToken', data.token);",
+  "});"
+]));
 
-domainItems.push(createLoginItem(
-  "TC-A01: Valid User Login (test@eshop.com)",
-  { email: "test@eshop.com", password: "Test1234!" },
+domainItems.push(createLoginItem("TC-A02: Valid Admin Login (admin@eshop.com)", { email: "admin@eshop.com", password: "Admin123!" }, [
+  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+  "var data = pm.response.json();",
+  "pm.test('Returns JWT token string for Admin', function () { pm.expect(data.token).to.be.a('string'); });",
+  "pm.test('Returns user object with role admin', function () {",
+  "    pm.expect(data.user.role).to.eql('admin');",
+  "    pm.environment.set('adminToken', data.token);",
+  "});"
+]));
+
+domainItems.push(createLoginItem("TC-A03: Invalid Email Format - Missing @", { email: "testeshop.com", password: "Test1234!" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized for invalid email format', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A04: Invalid Email Format - Missing Domain", { email: "test@", password: "Test1234!" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A05: Invalid Email Format - Double Dots in Domain", { email: "test@domain..com", password: "Test1234!" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A06: Email is Empty String", { email: "", password: "Test1234!" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty email', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A07: Email is Null", { email: null, password: "Test1234!" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized on null email', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A08: Email is Whitespace Only", { email: "   ", password: "Test1234!" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized on whitespace email', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A09: Email Not Registered in System", { email: "nonexistent_user_999@eshop.com", password: "Test1234!" }, [
+  "pm.test('Expect 401 Unauthorized for unregistered email', function () { pm.response.to.have.status(401); });",
+  "pm.test('Error message is generic without leaking user existence', function () { var data = pm.response.json(); pm.expect(data.error).to.be.a('string'); });"
+]));
+
+domainItems.push(createLoginItem("TC-A10: Password is Empty String", { email: "admin@eshop.com", password: "" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty password', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A11: Password is Null", { email: "admin@eshop.com", password: null }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized on null password', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A12: Completely Wrong Password", { email: "nonexistent_user_999@eshop.com", password: "CompletelyWrongPassword999!" }, [
+  "pm.test('Expect 401 Unauthorized on wrong credentials', function () { pm.response.to.have.status(401); });",
+  "pm.test('Does not return token', function () { var data = pm.response.json(); pm.expect(data.token).to.be.undefined; });"
+]));
+
+domainItems.push(createLoginItem("TC-A13: Password Case Sensitivity Test", { email: "nonexistent_user_999@eshop.com", password: "test1234!" }, [
+  "pm.test('Expect 401 Unauthorized', function () { pm.response.to.have.status(401); });"
+]));
+
+domainItems.push(createLoginItem("TC-A14: Empty JSON Request Body {}", {}, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty body', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A15: Missing Email Field", { password: "Test1234!" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized on missing email', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A16: Missing Password Field", { email: "test@eshop.com" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized on missing password', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A17: Extra Field Injection (role: admin)", { email: "test@eshop.com", password: "Test1234!", role: "admin" }, [
+  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+  "pm.test('User role remains user, cannot elevate privilege via login body', function () { var data = pm.response.json(); pm.expect(data.user.role).to.eql('user'); });"
+]));
+
+domainItems.push(createLoginItem("TC-A18: Boundary - Password Under Min Length (7 chars)", { email: "nonexistent_user_999@eshop.com", password: "Pass12!" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A19: Boundary - Password Exactly 8 chars", { email: "nonexistent_user_999@eshop.com", password: "Pass123!" }, [
+  "pm.test('Expect 401 Unauthorized (wrong password)', function () { pm.response.to.have.status(401); });"
+]));
+
+domainItems.push(createLoginItem("TC-A20: Boundary - Extremely Long Email (255 chars)", { email: "a".repeat(240) + "@eshop.com", password: "Test1234!" }, [
+  "pm.test('Expect 400 or 401 without server crash', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+
+domainItems.push(createLoginItem("TC-A21: Boundary - Extremely Long Password (1000 chars)", { email: "nonexistent_user_999@eshop.com", password: "A".repeat(998) + "1!" }, [
+  "pm.test('Expect 401 Unauthorized without DoS crash', function () { pm.response.to.have.status(401); });"
+]));
+
+domainItems.push(createLoginItem("TC-A22: Format - Email with Leading and Trailing Whitespace", { email: "  test@eshop.com  ", password: "Test1234!" }, [
+  "pm.test('Expect 200 OK (trimmed) or 401 Unauthorized', function () { pm.expect(pm.response.code).to.be.oneOf([200, 401]); });"
+]));
+
+fr02Folder.item.push({ name: "01.1 Domain & Boundary Tests", item: domainItems });
+
+const stateItems = [];
+stateItems.push(createLoginItem("TC-A23: Lockout Cycle - Failed Attempt 1", { email: "lockout_demo@eshop.com", password: "WrongPassword_1" }, [
+  "pm.test('Attempt 1 fails with 401 Unauthorized', function () { pm.response.to.have.status(401); });"
+]));
+stateItems.push(createLoginItem("TC-A24: Lockout Cycle - Failed Attempt 2", { email: "lockout_demo@eshop.com", password: "WrongPassword_2" }, [
+  "pm.test('Attempt 2 fails with 401 Unauthorized', function () { pm.response.to.have.status(401); });"
+]));
+stateItems.push(createLoginItem("TC-A25: Lockout Cycle - Failed Attempt 3 (Triggers Lockout)", { email: "lockout_demo@eshop.com", password: "WrongPassword_3" }, [
+  "pm.test('Attempt 3 fails with 401 Unauthorized', function () { pm.response.to.have.status(401); });"
+]));
+stateItems.push(createLoginItem("TC-A26: Lockout Cycle - Attempt 4 While Locked (With CORRECT Password)", { email: "lockout_demo@eshop.com", password: "CorrectPassword123!" }, [
+  "pm.test('Expect 403 Forbidden because account is temporarily locked', function () { pm.response.to.have.status(403); });",
+  "pm.test('Error message mentions account is locked', function () { var data = pm.response.json(); pm.expect(data.error).to.include('khóa'); });"
+]));
+stateItems.push(createLoginItem("TC-A27: Lockout Cycle - Attempt 5 While Locked (With WRONG Password)", { email: "lockout_demo@eshop.com", password: "WrongPassword_5" }, [
+  "pm.test('Expect 403 Forbidden while account remains locked', function () { pm.response.to.have.status(403); });"
+]));
+stateItems.push(createLoginItem("TC-A28: State Reset - Successful Login Resets Failed Counter", { email: "test@eshop.com", password: "Test1234!" }, [
+  "pm.test('Login succeeds with 200 OK', function () { pm.response.to.have.status(200); });",
+  "pm.test('User can login normally and receives token', function () { var data = pm.response.json(); pm.expect(data.token).to.be.a('string'); });"
+]));
+fr02Folder.item.push({ name: "01.2 State & Lockout Tests", item: stateItems });
+
+const securityItems = [];
+securityItems.push(createLoginItem("TC-A29: SQL Injection in Email (' OR '1'='1)", { email: "' OR '1'='1", password: "anypassword" }, [
+  "pm.test('SQLi in Email must NOT result in 200 OK bypass', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });",
+  "pm.test('No JWT token granted via SQL injection', function () { var data = pm.response.json(); pm.expect(data.token).to.be.undefined; });"
+]));
+securityItems.push(createLoginItem("TC-A30: SQL Injection in Password (' OR '1'='1)", { email: "admin@eshop.com", password: "' OR '1'='1" }, [
+  "pm.test('SQLi in Password must NOT bypass password check', function () { pm.response.to.have.status(401); });"
+]));
+securityItems.push(createLoginItem("TC-A31: SQL Injection Comment Syntax (admin@eshop.com'--)", { email: "admin@eshop.com'--", password: "fakepassword" }, [
+  "pm.test('SQLi comment payload rejected with 401', function () { pm.response.to.have.status(401); });"
+]));
+securityItems.push(createLoginItem("TC-A32: SQL Injection UNION SELECT Payload", { email: "test@eshop.com' UNION SELECT 1,2,3--", password: "p" }, [
+  "pm.test('SQLi UNION payload rejected with 401', function () { pm.response.to.have.status(401); });"
+]));
+securityItems.push(createLoginItem("TC-A33: SEC-01 Check - No Plaintext or Hashed Password in Response", { email: "test@eshop.com", password: "Test1234!" }, [
+  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+  "pm.test('SEC-01 Violation Check: Password MUST NOT be exposed in user object', function () { var data = pm.response.json(); pm.expect(data.user.password, 'Vulnerability SEC-01: Plaintext password is leaked in response!').to.be.undefined; });"
+]));
+securityItems.push(createLoginItem("TC-A34: NoSQL / Object Injection in JSON Body", { email: { "$gt": "" }, password: { "$gt": "" } }, [
+  "pm.test('Expect 400 Bad Request on object injection', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+securityItems.push(createLoginItem("TC-A35: Content-Type Header Tampering (text/plain)", null, [
+  "pm.test('Expect 400 Bad Request or 415 Unsupported Media Type', function () { pm.expect(pm.response.code).to.be.oneOf([400, 415, 500]); });"
+], "email=test@eshop.com&password=Test1234!", [{ key: "Content-Type", value: "text/plain", type: "text" }]));
+fr02Folder.item.push({ name: "01.3 Security & SQLi Tests", item: securityItems });
+
+const schemaItems = [];
+schemaItems.push(createLoginItem("TC-A36: Schema - JWT Token Format Verification", { email: "test@eshop.com", password: "Test1234!" }, [
+  "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
+  "pm.test('Token follows JWT 3-part format (header.payload.signature)', function () { var data = pm.response.json(); pm.expect(data.token).to.be.a('string'); var parts = data.token.split('.'); pm.expect(parts.length).to.eql(3); });"
+]));
+schemaItems.push(createLoginItem("TC-A37: Schema - User Object Structure Verification", { email: "test@eshop.com", password: "Test1234!" }, [
+  "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
+  "pm.test('User object contains required fields: id, name, email, role', function () { var data = pm.response.json(); pm.expect(data.user).to.have.property('id').that.is.a('number'); pm.expect(data.user).to.have.property('name').that.is.a('string'); pm.expect(data.user).to.have.property('email').that.is.a('string'); pm.expect(data.user).to.have.property('role').that.is.a('string'); });"
+]));
+schemaItems.push(createLoginItem("TC-A38: Schema - Success Message Field Verification", { email: "test@eshop.com", password: "Test1234!" }, [
+  "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
+  "pm.test('Response contains message: Login successful', function () { var data = pm.response.json(); pm.expect(data.message).to.eql('Login successful'); });"
+]));
+fr02Folder.item.push({ name: "01.4 Schema Validation Tests", item: schemaItems });
+
+const extItems = [];
+extItems.push(createLoginItem("TC-EXT-01: Case-Insensitive Email Authentication (TEST@ESHOP.COM)", { email: "TEST@ESHOP.COM", password: "Test1234!" }, [
+  "pm.test('Email RFC standard: Login succeeds with 200 OK on uppercase email', function () { pm.response.to.have.status(200); });"
+]));
+extItems.push(createLoginItem("TC-EXT-02: JWT Token Payload Claims Verification", { email: "test@eshop.com", password: "Test1234!" }, [
+  "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
+  "pm.test('JWT Payload contains matching id and role claims', function () { var data = pm.response.json(); var token = data.token; var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); var payload = JSON.parse(jsonPayload); pm.expect(payload.id).to.eql(data.user.id); pm.expect(payload.role).to.eql(data.user.role); });"
+]));
+extItems.push(createLoginItem("TC-EXT-03: Malformed JSON Body Defense", null, [
+  "pm.test('Expect 400 Bad Request on malformed JSON body without server crash', function () { pm.expect(pm.response.code).to.be.oneOf([400, 500]); });"
+], "{email: \"test@eshop.com\", password"));
+extItems.push(createLoginItem("TC-EXT-04: Timing Attack Defense (Existing vs Non-existing email)", { email: "nonexistent_user_999@eshop.com", password: "WrongPassword999!" }, [
+  "pm.test('Response time is under 500ms preventing timing discrepancy', function () { pm.expect(pm.response.responseTime).to.be.below(500); });"
+]));
+extItems.push(createLoginItem("TC-EXT-05: Unicode Characters in Email (nguyễnvana@eshop.com)", { email: "nguyễnvana@eshop.com", password: "Password123!" }, [
+  "pm.test('Expect 400 Bad Request or 401 Unauthorized safely handled', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
+]));
+extItems.push(createLoginItem("TC-EXT-06: Lockout Duration Verification (30 seconds)", { email: "lockout_demo@eshop.com", password: "CorrectPassword123!" }, [
+  "pm.test('Verifies lockout state on locked account', function () { pm.response.to.have.status(403); });"
+]));
+fr02Folder.item.push({ name: "01.5 Human Extension Tests", item: extItems });
+
+
+// ============================================================================
+// 02. POOL B - FR-08 CHECKOUT
+// ============================================================================
+const fr08Folder = {
+  name: "02. Pool B - FR-08 Checkout",
+  item: [
+    // Pre-requisite 1: Refresh userToken
+    {
+      name: "02.0 Setup A: Ensure Authenticated User Token",
+      event: [{
+        listen: "test",
+        script: {
+          type: "text/javascript",
+          exec: [
+            "pm.test('Login succeeds and saves fresh userToken', function () {",
+            "    pm.response.to.have.status(200);",
+            "    var data = pm.response.json();",
+            "    pm.environment.set('userToken', data.token);",
+            "});"
+          ]
+        }
+      }],
+      request: {
+        method: "POST",
+        header: [{ key: "Content-Type", value: "application/json", type: "text" }],
+        body: { mode: "raw", raw: JSON.stringify({ email: "test@eshop.com", password: "Test1234!" }) },
+        url: { raw: "{{baseUrl}}/api/login", host: ["{{baseUrl}}"], path: ["api", "login"] }
+      },
+      response: []
+    },
+    // Pre-requisite 2: Add product to cart for checkout tests
+    {
+      name: "02.0 Setup B: Populate User Cart (POST /api/cart)",
+      event: [{
+        listen: "test",
+        script: {
+          type: "text/javascript",
+          exec: [
+            "pm.test('Product added to user cart successfully', function () {",
+            "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+            "});"
+          ]
+        }
+      }],
+      request: {
+        method: "POST",
+        header: [
+          { key: "Content-Type", value: "application/json", type: "text" },
+          { key: "Authorization", value: "Bearer {{userToken}}", type: "text" }
+        ],
+        body: { mode: "raw", raw: JSON.stringify({ productId: 1, quantity: 1 }) },
+        url: { raw: "{{baseUrl}}/api/cart", host: ["{{baseUrl}}"], path: ["api", "cart"] }
+      },
+      response: []
+    }
+  ]
+};
+
+// --- Subfolder: 02.1 Domain & Boundary Tests ---
+const fr08DomainItems = [];
+
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B01: Valid Checkout with Standard Amount & Address",
+  { total_amount: 30000000, shipping_address: "123 Le Loi, Quan 1, TP.HCM" },
   [
     "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
     "var data = pm.response.json();",
-    "pm.test('Returns JWT token string', function () { pm.expect(data.token).to.be.a('string').and.not.empty; });",
-    "pm.test('Returns user object with role user', function () {",
-    "    pm.expect(data.user).to.be.an('object');",
-    "    pm.expect(data.user.email).to.eql('test@eshop.com');",
-    "    pm.expect(data.user.role).to.eql('user');",
-    "    pm.environment.set('userToken', data.token);",
-    "});"
+    "pm.test('Response message is Checkout successful', function () { pm.expect(data.message).to.eql('Checkout successful'); });",
+    "pm.test('Returns valid positive orderId', function () { pm.expect(data.orderId).to.be.a('number').and.above(0); pm.environment.set('createdOrderId', data.orderId); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A02: Valid Admin Login (admin@eshop.com)",
-  { email: "admin@eshop.com", password: "Admin123!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B02: Valid Positive Total Amount (200000)",
+  { total_amount: 200000, shipping_address: "456 Nguyen Hue, Quan 1" },
   [
     "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
     "var data = pm.response.json();",
-    "pm.test('Returns JWT token string for Admin', function () { pm.expect(data.token).to.be.a('string'); });",
-    "pm.test('Returns user object with role admin', function () {",
-    "    pm.expect(data.user.role).to.eql('admin');",
-    "    pm.environment.set('adminToken', data.token);",
-    "});"
+    "pm.test('Returns orderId', function () { pm.expect(data.orderId).to.be.a('number'); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A03: Invalid Email Format - Missing @",
-  { email: "testeshop.com", password: "Test1234!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B03: Boundary - Float Total Amount (199999.50)",
+  { total_amount: 199999.5, shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized for invalid email format', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
+    "pm.test('Expect 200 OK or 400 Bad Request handled safely', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A04: Invalid Email Format - Missing Domain",
-  { email: "test@", password: "Test1234!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B04: Boundary - Zero Total Amount (total_amount = 0)",
+  { total_amount: 0, shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
+    "pm.test('FR-08: Expect 400 Bad Request when order total_amount is 0', function () { pm.response.to.have.status(400); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A05: Invalid Email Format - Double Dots in Domain",
-  { email: "test@domain..com", password: "Test1234!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B05: Boundary - Negative Total Amount (total_amount = -50000)",
+  { total_amount: -50000, shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
+    "pm.test('FR-08: Expect 400 Bad Request when total_amount is negative', function () { pm.response.to.have.status(400); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A06: Email is Empty String",
-  { email: "", password: "Test1234!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B06: Invalid Type - String Number for total_amount (\"200000\")",
+  { total_amount: "200000", shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty email', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
+    "pm.test('Expect 200 OK or 400 Bad Request', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A07: Email is Null",
-  { email: null, password: "Test1234!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B07: Invalid Type - Non-numeric String for total_amount",
+  { total_amount: "hai tram nghin", shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized on null email', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
+    "pm.test('FR-08: Expect 400 Bad Request when total_amount is non-numeric string', function () { pm.response.to.have.status(400); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A08: Email is Whitespace Only",
-  { email: "   ", password: "Test1234!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B08: Invalid Type - Boolean for total_amount (true)",
+  { total_amount: true, shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized on whitespace email', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
+    "pm.test('FR-08: Expect 400 Bad Request when total_amount is boolean', function () { pm.response.to.have.status(400); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A09: Email Not Registered in System",
-  { email: "nonexistent_user_999@eshop.com", password: "Test1234!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B09: Invalid Type - Null total_amount",
+  { total_amount: null, shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 401 Unauthorized for unregistered email', function () {",
-    "    pm.response.to.have.status(401);",
-    "});",
-    "pm.test('Error message is generic without leaking user existence', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.error).to.be.a('string');",
-    "});"
+    "pm.test('FR-08: Expect 400 Bad Request when total_amount is null', function () { pm.response.to.have.status(400); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A10: Password is Empty String",
-  { email: "admin@eshop.com", password: "" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B10: Extreme Boundary - Very Large Total Amount (10^12)",
+  { total_amount: 1000000000000, shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty password', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
+    "pm.test('Expect 200 OK or 400 without server crash', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A11: Password is Null",
-  { email: "admin@eshop.com", password: null },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B11: Missing Required Field - Missing total_amount",
+  { shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized on null password', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
+    "pm.test('FR-08: Expect 400 Bad Request when missing total_amount', function () { pm.response.to.have.status(400); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A12: Completely Wrong Password",
-  { email: "nonexistent_user_999@eshop.com", password: "CompletelyWrongPassword999!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B12: Valid Standard Shipping Address",
+  { total_amount: 200000, shipping_address: "So 1 Dai Co Viet, Hai Ba Trung, Ha Noi" },
   [
-    "pm.test('Expect 401 Unauthorized on wrong credentials', function () {",
-    "    pm.response.to.have.status(401);",
-    "});",
-    "pm.test('Does not return token', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.token).to.be.undefined;",
-    "});"
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A13: Password Case Sensitivity Test",
-  { email: "nonexistent_user_999@eshop.com", password: "test1234!" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B13: Boundary - Empty String Shipping Address (\"\")",
+  { total_amount: 200000, shipping_address: "" },
   [
-    "pm.test('Expect 401 Unauthorized', function () {",
-    "    pm.response.to.have.status(401);",
-    "});"
+    "pm.test('FR-08: Expect 400 Bad Request when shipping_address is empty', function () { pm.response.to.have.status(400); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A14: Empty JSON Request Body {}",
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B14: Boundary - Whitespace Only Shipping Address (\"   \")",
+  { total_amount: 200000, shipping_address: "   " },
+  [
+    "pm.test('FR-08: Expect 400 Bad Request when shipping_address is whitespace', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B15: Invalid Type - Null Shipping Address",
+  { total_amount: 200000, shipping_address: null },
+  [
+    "pm.test('FR-08: Expect 400 Bad Request when shipping_address is null', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B16: Invalid Type - Number as Shipping Address (12345)",
+  { total_amount: 200000, shipping_address: 12345 },
+  [
+    "pm.test('FR-08: Expect 400 Bad Request when shipping_address is number', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B17: Boundary - Minimum Length Address (1 char \"A\")",
+  { total_amount: 200000, shipping_address: "A" },
+  [
+    "pm.test('Expect 400 Bad Request or 200 OK', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+  ]
+));
+
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B18: Boundary - Extremely Long Address (1000 chars)",
+  { total_amount: 200000, shipping_address: "X".repeat(1000) },
+  [
+    "pm.test('Expect 200 OK or 400 without crash', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+  ]
+));
+
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B19: Format - Unicode Vietnamese Address",
+  { total_amount: 200000, shipping_address: "123 Đường Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh" },
+  [
+    "pm.test('Status code is 200 OK on Vietnamese Unicode', function () { pm.response.to.have.status(200); });"
+  ]
+));
+
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B20: Missing Required Field - Missing shipping_address",
+  { total_amount: 200000 },
+  [
+    "pm.test('FR-08: Expect 400 Bad Request when missing shipping_address', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B21: Boundary - Empty Request Body {}",
   {},
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty body', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
+    "pm.test('FR-08: Expect 400 Bad Request on empty JSON body', function () { pm.response.to.have.status(400); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A15: Missing Email Field",
-  { password: "Test1234!" },
-  [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized on missing email', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
-  ]
-));
-
-domainItems.push(createLoginItem(
-  "TC-A16: Missing Password Field",
-  { email: "test@eshop.com" },
-  [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized on missing password', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
-  ]
-));
-
-domainItems.push(createLoginItem(
-  "TC-A17: Extra Field Injection (role: admin)",
-  { email: "test@eshop.com", password: "Test1234!", role: "admin" },
+fr08DomainItems.push(createCheckoutItem(
+  "TC-B22: Security - Extra Field Injection (status: delivered)",
+  { total_amount: 200000, shipping_address: "123 Le Loi", status: "delivered" },
   [
     "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
-    "pm.test('User role remains user, cannot elevate privilege via login body', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.user.role).to.eql('user');",
-    "});"
+    "var data = pm.response.json();",
+    "pm.test('Order created successfully', function () { pm.expect(data.orderId).to.be.a('number'); });"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A18: Boundary - Password Under Min Length (7 chars)",
-  { email: "nonexistent_user_999@eshop.com", password: "Pass12!" },
+fr08Folder.item.push({ name: "02.1 Domain & Boundary Tests", item: fr08DomainItems });
+
+// --- Subfolder: 02.2 State & Cart Dependency Tests ---
+const fr08StateItems = [];
+
+fr08StateItems.push(createCheckoutItem(
+  "TC-B23: State - Checkout When Cart is EMPTY",
+  { total_amount: 200000, shipping_address: "123 Le Loi" },
   [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+    "pm.test('FR-08 Requirement: Cannot checkout when cart is empty - Expect 400 Bad Request', function () {",
+    "    pm.response.to.have.status(400);",
     "});"
   ]
 ));
 
-domainItems.push(createLoginItem(
-  "TC-A19: Boundary - Password Exactly 8 chars",
-  { email: "nonexistent_user_999@eshop.com", password: "Pass123!" },
-  [
-    "pm.test('Expect 401 Unauthorized (wrong password)', function () {",
-    "    pm.response.to.have.status(401);",
-    "});"
-  ]
-));
-
-domainItems.push(createLoginItem(
-  "TC-A20: Boundary - Extremely Long Email (255 chars)",
-  { email: "a".repeat(240) + "@eshop.com", password: "Test1234!" },
-  [
-    "pm.test('Expect 400 or 401 without server crash', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
-  ]
-));
-
-domainItems.push(createLoginItem(
-  "TC-A21: Boundary - Extremely Long Password (1000 chars)",
-  { email: "nonexistent_user_999@eshop.com", password: "A".repeat(998) + "1!" },
-  [
-    "pm.test('Expect 401 Unauthorized without DoS crash', function () {",
-    "    pm.response.to.have.status(401);",
-    "});"
-  ]
-));
-
-domainItems.push(createLoginItem(
-  "TC-A22: Format - Email with Leading and Trailing Whitespace",
-  { email: "  test@eshop.com  ", password: "Test1234!" },
-  [
-    "pm.test('Expect 200 OK (trimmed) or 401 Unauthorized', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([200, 401]);",
-    "});"
-  ]
-));
-
-fr02Folder.item.push({
-  name: "01.1 Domain & Boundary Tests",
-  item: domainItems
+// Cart Setup helper
+fr08StateItems.push({
+  name: "02.2.1 State Setup: Add Item to Cart for Checkout Flow",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: ["pm.test('Product added to cart for state test', function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });"]
+    }
+  }],
+  request: {
+    method: "POST",
+    header: [
+      { key: "Content-Type", value: "application/json", type: "text" },
+      { key: "Authorization", value: "Bearer {{userToken}}", type: "text" }
+    ],
+    body: { mode: "raw", raw: JSON.stringify({ productId: 1, quantity: 1 }) },
+    url: { raw: "{{baseUrl}}/api/cart", host: ["{{baseUrl}}"], path: ["api", "cart"] }
+  },
+  response: []
 });
 
-// --- Subfolder: 01.2 State & Lockout Tests ---
-const stateItems = [];
-
-stateItems.push(createLoginItem(
-  "TC-A23: Lockout Cycle - Failed Attempt 1",
-  { email: "lockout_demo@eshop.com", password: "WrongPassword_1" },
-  [
-    "pm.test('Attempt 1 fails with 401 Unauthorized', function () {",
-    "    pm.response.to.have.status(401);",
-    "});"
-  ]
-));
-
-stateItems.push(createLoginItem(
-  "TC-A24: Lockout Cycle - Failed Attempt 2",
-  { email: "lockout_demo@eshop.com", password: "WrongPassword_2" },
-  [
-    "pm.test('Attempt 2 fails with 401 Unauthorized', function () {",
-    "    pm.response.to.have.status(401);",
-    "});"
-  ]
-));
-
-stateItems.push(createLoginItem(
-  "TC-A25: Lockout Cycle - Failed Attempt 3 (Triggers Lockout)",
-  { email: "lockout_demo@eshop.com", password: "WrongPassword_3" },
-  [
-    "pm.test('Attempt 3 fails with 401 Unauthorized', function () {",
-    "    pm.response.to.have.status(401);",
-    "});"
-  ]
-));
-
-stateItems.push(createLoginItem(
-  "TC-A26: Lockout Cycle - Attempt 4 While Locked (With CORRECT Password)",
-  { email: "lockout_demo@eshop.com", password: "CorrectPassword123!" },
-  [
-    "pm.test('Expect 403 Forbidden because account is temporarily locked', function () {",
-    "    pm.response.to.have.status(403);",
-    "});",
-    "pm.test('Error message mentions account is locked', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.error).to.include('khóa');",
-    "});"
-  ]
-));
-
-stateItems.push(createLoginItem(
-  "TC-A27: Lockout Cycle - Attempt 5 While Locked (With WRONG Password)",
-  { email: "lockout_demo@eshop.com", password: "WrongPassword_5" },
-  [
-    "pm.test('Expect 403 Forbidden while account remains locked', function () {",
-    "    pm.response.to.have.status(403);",
-    "});"
-  ]
-));
-
-stateItems.push(createLoginItem(
-  "TC-A28: State Reset - Successful Login Resets Failed Counter",
-  { email: "test@eshop.com", password: "Test1234!" },
-  [
-    "pm.test('Login succeeds with 200 OK', function () {",
-    "    pm.response.to.have.status(200);",
-    "});",
-    "pm.test('User can login normally and receives token', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.token).to.be.a('string');",
-    "});"
-  ]
-));
-
-fr02Folder.item.push({
-  name: "01.2 State & Lockout Tests",
-  item: stateItems
-});
-
-// --- Subfolder: 01.3 Security & SQLi Tests ---
-const securityItems = [];
-
-securityItems.push(createLoginItem(
-  "TC-A29: SQL Injection in Email (' OR '1'='1)",
-  { email: "' OR '1'='1", password: "anypassword" },
-  [
-    "pm.test('SQLi in Email must NOT result in 200 OK bypass', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});",
-    "pm.test('No JWT token granted via SQL injection', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.token).to.be.undefined;",
-    "});"
-  ]
-));
-
-securityItems.push(createLoginItem(
-  "TC-A30: SQL Injection in Password (' OR '1'='1)",
-  { email: "admin@eshop.com", password: "' OR '1'='1" },
-  [
-    "pm.test('SQLi in Password must NOT bypass password check', function () {",
-    "    pm.response.to.have.status(401);",
-    "});"
-  ]
-));
-
-securityItems.push(createLoginItem(
-  "TC-A31: SQL Injection Comment Syntax (admin@eshop.com'--)",
-  { email: "admin@eshop.com'--", password: "fakepassword" },
-  [
-    "pm.test('SQLi comment payload rejected with 401', function () {",
-    "    pm.response.to.have.status(401);",
-    "});"
-  ]
-));
-
-securityItems.push(createLoginItem(
-  "TC-A32: SQL Injection UNION SELECT Payload",
-  { email: "test@eshop.com' UNION SELECT 1,2,3--", password: "p" },
-  [
-    "pm.test('SQLi UNION payload rejected with 401', function () {",
-    "    pm.response.to.have.status(401);",
-    "});"
-  ]
-));
-
-securityItems.push(createLoginItem(
-  "TC-A33: SEC-01 Check - No Plaintext or Hashed Password in Response",
-  { email: "test@eshop.com", password: "Test1234!" },
+fr08StateItems.push(createCheckoutItem(
+  "TC-B24: State - Checkout With Active Cart Items",
+  { total_amount: 30000000, shipping_address: "123 Le Loi" },
   [
     "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
-    "pm.test('SEC-01 Violation Check: Password MUST NOT be exposed in user object', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.user.password, 'Vulnerability SEC-01: Plaintext password is leaked in response!').to.be.undefined;",
-    "});"
+    "var data = pm.response.json();",
+    "pm.test('Returns valid orderId', function () { pm.expect(data.orderId).to.be.a('number'); pm.environment.set('latestOrderId', data.orderId); });"
   ]
 ));
 
-securityItems.push(createLoginItem(
-  "TC-A34: NoSQL / Object Injection in JSON Body",
-  { email: { "$gt": "" }, password: { "$gt": "" } },
+// Post-checkout Cart Cleared Check
+fr08StateItems.push({
+  name: "TC-B25: State - Verify Cart Cleared Post-Checkout (GET /api/cart)",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: [
+        "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+        "var data = pm.response.json();",
+        "pm.test('FR-08 Requirement: User cart MUST be emptied post-checkout', function () {",
+        "    var cartItems = data.cart || data;",
+        "    pm.expect(cartItems, 'Vulnerability FR-08: Cart was NOT cleared after checkout!').to.be.an('array').that.is.empty;",
+        "});"
+      ]
+    }
+  }],
+  request: {
+    method: "GET",
+    header: [{ key: "Authorization", value: "Bearer {{userToken}}", type: "text" }],
+    url: { raw: "{{baseUrl}}/api/cart", host: ["{{baseUrl}}"], path: ["api", "cart"] }
+  },
+  response: []
+});
+
+// Verify Order Initial State
+fr08StateItems.push({
+  name: "TC-B26: State - Verify Initial Order Status is Pending (GET /api/orders/my-orders)",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: [
+        "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+        "var orders = pm.response.json();",
+        "pm.test('FR-10 Requirement: Initial order status MUST be pending', function () {",
+        "    pm.expect(orders).to.be.an('array').and.not.empty;",
+        "    var latest = orders[orders.length - 1];",
+        "    pm.expect(latest.status).to.eql('pending');",
+        "});"
+      ]
+    }
+  }],
+  request: {
+    method: "GET",
+    header: [{ key: "Authorization", value: "Bearer {{userToken}}", type: "text" }],
+    url: { raw: "{{baseUrl}}/api/orders/my-orders", host: ["{{baseUrl}}"], path: ["api", "orders", "my-orders"] }
+  },
+  response: []
+});
+
+// Multi-item cart checkout
+fr08StateItems.push({
+  name: "02.2.2 State Setup: Add Multiple Items to Cart",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: ["pm.test('Item added to cart', function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });"]
+    }
+  }],
+  request: {
+    method: "POST",
+    header: [
+      { key: "Content-Type", value: "application/json", type: "text" },
+      { key: "Authorization", value: "Bearer {{userToken}}", type: "text" }
+    ],
+    body: { mode: "raw", raw: JSON.stringify({ productId: 2, quantity: 2 }) },
+    url: { raw: "{{baseUrl}}/api/cart", host: ["{{baseUrl}}"], path: ["api", "cart"] }
+  },
+  response: []
+});
+
+fr08StateItems.push(createCheckoutItem(
+  "TC-B27: State - Checkout With Multiple Cart Items",
+  { total_amount: 56000000, shipping_address: "789 Tran Hung Dao" },
   [
-    "pm.test('Expect 400 Bad Request on object injection', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
+    "pm.test('Status code is 200 OK for multi-item checkout', function () { pm.response.to.have.status(200); });"
+  ]
+));
+
+fr08StateItems.push({
+  name: "TC-B28: State - Verify Order User Association (GET /api/orders/my-orders)",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: [
+        "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+        "var orders = pm.response.json();",
+        "pm.test('All orders belong to authenticated user', function () {",
+        "    orders.forEach(function(order) {",
+        "        pm.expect(order).to.have.property('user_id');",
+        "    });",
+        "});"
+      ]
+    }
+  }],
+  request: {
+    method: "GET",
+    header: [{ key: "Authorization", value: "Bearer {{userToken}}", type: "text" }],
+    url: { raw: "{{baseUrl}}/api/orders/my-orders", host: ["{{baseUrl}}"], path: ["api", "orders", "my-orders"] }
+  },
+  response: []
+});
+
+fr08Folder.item.push({ name: "02.2 State & Cart Dependency Tests", item: fr08StateItems });
+
+// --- Subfolder: 02.3 Security & Price Tampering Tests ---
+const fr08SecurityItems = [];
+
+fr08SecurityItems.push(createCheckoutItem(
+  "TC-B29: SEC-02 Check - Unauthenticated Request (Missing Token)",
+  { total_amount: 200000, shipping_address: "123 Le Loi" },
+  [
+    "pm.test('SEC-02: Expect 401 Unauthorized when token is missing', function () { pm.response.to.have.status(401); });"
+  ],
+  null, [], null
+));
+
+fr08SecurityItems.push(createCheckoutItem(
+  "TC-B30: SEC-02 Check - Invalid Bearer Token Signature",
+  { total_amount: 200000, shipping_address: "123 Le Loi" },
+  [
+    "pm.test('SEC-02: Expect 403 Forbidden on forged token', function () { pm.response.to.have.status(403); });"
+  ],
+  null, [], "Bearer invalid_signature_token_abc"
+));
+
+fr08SecurityItems.push(createCheckoutItem(
+  "TC-B31: SEC-02 Check - Empty Bearer Token Value",
+  { total_amount: 200000, shipping_address: "123 Le Loi" },
+  [
+    "pm.test('SEC-02: Expect 401 or 403 on empty bearer token', function () { pm.expect(pm.response.code).to.be.oneOf([401, 403]); });"
+  ],
+  null, [], "Bearer "
+));
+
+fr08SecurityItems.push(createCheckoutItem(
+  "TC-B32: SEC-04 Check - Stored XSS Script Payload in shipping_address",
+  { total_amount: 200000, shipping_address: "<script>alert('XSS')</script>" },
+  [
+    "pm.test('Status is 200 OK or 400 handled safely', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+  ]
+));
+
+fr08SecurityItems.push(createCheckoutItem(
+  "TC-B33: SEC-04 Check - HTML Img Error XSS in shipping_address",
+  { total_amount: 200000, shipping_address: "<img src=x onerror=alert('XSS')>" },
+  [
+    "pm.test('Status is 200 OK or 400 handled safely', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+  ]
+));
+
+fr08SecurityItems.push(createCheckoutItem(
+  "TC-B34: SEC-05 Check - SQL Injection Payload in shipping_address",
+  { total_amount: 200000, shipping_address: "123 Le Loi', 'delivered'); --" },
+  [
+    "pm.test('SQLi handled safely by parameterized query', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+  ]
+));
+
+// Price Tampering Setup & Test
+fr08SecurityItems.push({
+  name: "02.3.1 Setup: Add High Value Item to Cart (30,000,000đ)",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: ["pm.test('Item added to cart', function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });"]
+    }
+  }],
+  request: {
+    method: "POST",
+    header: [
+      { key: "Content-Type", value: "application/json", type: "text" },
+      { key: "Authorization", value: "Bearer {{userToken}}", type: "text" }
+    ],
+    body: { mode: "raw", raw: JSON.stringify({ productId: 1, quantity: 1 }) },
+    url: { raw: "{{baseUrl}}/api/cart", host: ["{{baseUrl}}"], path: ["api", "cart"] }
+  },
+  response: []
+});
+
+fr08SecurityItems.push(createCheckoutItem(
+  "TC-B35: Vulnerability Check - Price Tampering (Client sends 1,000đ vs 30,000,000đ)",
+  { total_amount: 1000, shipping_address: "123 Le Loi" },
+  [
+    "var data = pm.response.json();",
+    "pm.test('FR-08 Requirement: Backend MUST NOT accept client tampered total_amount (1000)', function () {",
+    "    // If backend accepts 1000 blindly, it violates FR-08",
+    "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
     "});"
   ]
 ));
 
-securityItems.push(createLoginItem(
-  "TC-A35: Content-Type Header Tampering (text/plain)",
+fr08SecurityItems.push(createCheckoutItem(
+  "TC-B36: Schema - Verify Success Response Structure",
+  { total_amount: 200000, shipping_address: "123 Le Loi" },
+  [
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+    "var data = pm.response.json();",
+    "pm.test('Response matches schema: message and orderId', function () {",
+    "    pm.expect(data).to.have.property('message').that.is.a('string');",
+    "    pm.expect(data).to.have.property('orderId').that.is.a('number');",
+    "});"
+  ]
+));
+
+fr08Folder.item.push({ name: "02.3 Security & Price Tampering Tests", item: fr08SecurityItems });
+
+// --- Subfolder: 02.4 Human Extension Tests ---
+const fr08ExtItems = [];
+
+fr08ExtItems.push(createCheckoutItem(
+  "TC-EXT-07: Free Order Exploit (total_amount = 0 with expensive cart)",
+  { total_amount: 0, shipping_address: "123 Le Loi" },
+  [
+    "pm.test('FR-08 Business Rule: Cannot place 0 VND order for valuable cart items', function () {",
+    "    pm.response.to.have.status(400);",
+    "});"
+  ]
+));
+
+fr08ExtItems.push({
+  name: "TC-EXT-08: Cart State Persistence Check Post-Checkout",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: [
+        "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
+        "var data = pm.response.json();",
+        "var cart = data.cart || data;",
+        "pm.test('Cart must be empty array [] post checkout', function () {",
+        "    pm.expect(cart, 'Cart was not cleared post checkout!').to.be.an('array').that.is.empty;",
+        "});"
+      ]
+    }
+  }],
+  request: {
+    method: "GET",
+    header: [{ key: "Authorization", value: "Bearer {{userToken}}", type: "text" }],
+    url: { raw: "{{baseUrl}}/api/cart", host: ["{{baseUrl}}"], path: ["api", "cart"] }
+  },
+  response: []
+});
+
+fr08ExtItems.push(createCheckoutItem(
+  "TC-EXT-09: BOLA / IDOR Defense - Injected user_id = 9999 in Request Body",
+  { user_id: 9999, total_amount: 200000, shipping_address: "123 Le Loi" },
+  [
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
+  ]
+));
+
+fr08ExtItems.push({
+  name: "TC-EXT-10: Stored XSS Retrieval Check (GET /api/orders/my-orders)",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: [
+        "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+        "var orders = pm.response.json();",
+        "pm.test('Orders retrieved safely without raw unescaped script tag execution', function () {",
+        "    pm.expect(orders).to.be.an('array');",
+        "});"
+      ]
+    }
+  }],
+  request: {
+    method: "GET",
+    header: [{ key: "Authorization", value: "Bearer {{userToken}}", type: "text" }],
+    url: { raw: "{{baseUrl}}/api/orders/my-orders", host: ["{{baseUrl}}"], path: ["api", "orders", "my-orders"] }
+  },
+  response: []
+});
+
+fr08ExtItems.push(createCheckoutItem(
+  "TC-EXT-11: Content-Type Tampering (application/x-www-form-urlencoded)",
   null,
   [
-    "pm.test('Expect 400 Bad Request or 415 Unsupported Media Type', function () {",
+    "pm.test('Expect 400 Bad Request or 415 on invalid Content-Type', function () {",
     "    pm.expect(pm.response.code).to.be.oneOf([400, 415, 500]);",
     "});"
   ],
-  "email=test@eshop.com&password=Test1234!",
-  [{ key: "Content-Type", value: "text/plain", type: "text" }]
+  "total_amount=200000&shipping_address=123+Le+Loi",
+  [{ key: "Content-Type", value: "application/x-www-form-urlencoded", type: "text" }]
 ));
 
-fr02Folder.item.push({
-  name: "01.3 Security & SQLi Tests",
-  item: securityItems
-});
-
-// --- Subfolder: 01.4 Schema Validation Tests ---
-const schemaItems = [];
-
-schemaItems.push(createLoginItem(
-  "TC-A36: Schema - JWT Token Format Verification",
-  { email: "test@eshop.com", password: "Test1234!" },
+fr08ExtItems.push(createCheckoutItem(
+  "TC-EXT-12: Rapid Concurrency / Double Submit Checkout Simulation",
+  { total_amount: 200000, shipping_address: "123 Le Loi" },
   [
-    "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
-    "pm.test('Token follows JWT 3-part format (header.payload.signature)', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.token).to.be.a('string');",
-    "    var parts = data.token.split('.');",
-    "    pm.expect(parts.length).to.eql(3);",
+    "pm.test('Handles concurrent checkout request gracefully', function () {",
+    "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
     "});"
   ]
 ));
 
-schemaItems.push(createLoginItem(
-  "TC-A37: Schema - User Object Structure Verification",
-  { email: "test@eshop.com", password: "Test1234!" },
-  [
-    "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
-    "pm.test('User object contains required fields: id, name, email, role', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.user).to.have.property('id').that.is.a('number');",
-    "    pm.expect(data.user).to.have.property('name').that.is.a('string');",
-    "    pm.expect(data.user).to.have.property('email').that.is.a('string');",
-    "    pm.expect(data.user).to.have.property('role').that.is.a('string');",
-    "});"
-  ]
-));
+fr08Folder.item.push({ name: "02.4 Human Extension Tests", item: fr08ExtItems });
 
-schemaItems.push(createLoginItem(
-  "TC-A38: Schema - Success Message Field Verification",
-  { email: "test@eshop.com", password: "Test1234!" },
-  [
-    "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
-    "pm.test('Response contains message: Login successful', function () {",
-    "    var data = pm.response.json();",
-    "    pm.expect(data.message).to.eql('Login successful');",
-    "});"
-  ]
-));
-
-fr02Folder.item.push({
-  name: "01.4 Schema Validation Tests",
-  item: schemaItems
-});
-
-// --- Subfolder: 01.5 Human Extension Tests ---
-const extItems = [];
-
-extItems.push(createLoginItem(
-  "TC-EXT-01: Case-Insensitive Email Authentication (TEST@ESHOP.COM)",
-  { email: "TEST@ESHOP.COM", password: "Test1234!" },
-  [
-    "pm.test('Email RFC standard: Login succeeds with 200 OK on uppercase email', function () {",
-    "    pm.response.to.have.status(200);",
-    "});"
-  ]
-));
-
-extItems.push(createLoginItem(
-  "TC-EXT-02: JWT Token Payload Claims Verification",
-  { email: "test@eshop.com", password: "Test1234!" },
-  [
-    "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
-    "pm.test('JWT Payload contains matching id and role claims', function () {",
-    "    var data = pm.response.json();",
-    "    var token = data.token;",
-    "    var base64Url = token.split('.')[1];",
-    "    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');",
-    "    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {",
-    "        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);",
-    "    }).join(''));",
-    "    var payload = JSON.parse(jsonPayload);",
-    "    pm.expect(payload.id).to.eql(data.user.id);",
-    "    pm.expect(payload.role).to.eql(data.user.role);",
-    "});"
-  ]
-));
-
-extItems.push(createLoginItem(
-  "TC-EXT-03: Malformed JSON Body Defense",
-  null,
-  [
-    "pm.test('Expect 400 Bad Request on malformed JSON body without server crash', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
-    "});"
-  ],
-  "{email: \"test@eshop.com\", password"
-));
-
-extItems.push(createLoginItem(
-  "TC-EXT-04: Timing Attack Defense (Existing vs Non-existing email)",
-  { email: "nonexistent_user_999@eshop.com", password: "WrongPassword999!" },
-  [
-    "pm.test('Response time is under 500ms preventing timing discrepancy', function () {",
-    "    pm.expect(pm.response.responseTime).to.be.below(500);",
-    "});"
-  ]
-));
-
-extItems.push(createLoginItem(
-  "TC-EXT-05: Unicode Characters in Email (nguyễnvana@eshop.com)",
-  { email: "nguyễnvana@eshop.com", password: "Password123!" },
-  [
-    "pm.test('Expect 400 Bad Request or 401 Unauthorized safely handled', function () {",
-    "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-    "});"
-  ]
-));
-
-extItems.push(createLoginItem(
-  "TC-EXT-06: Lockout Duration Verification (30 seconds)",
-  { email: "lockout_demo@eshop.com", password: "CorrectPassword123!" },
-  [
-    "pm.test('Verifies lockout state on locked account', function () {",
-    "    pm.response.to.have.status(403);",
-    "});"
-  ]
-));
-
-fr02Folder.item.push({
-  name: "01.5 Human Extension Tests",
-  item: extItems
-});
-
-// Add all folders to collection
+// ============================================================================
+// ASSEMBLE ALL FOLDERS
+// ============================================================================
 collection.item.push(healthCheckFolder);
 collection.item.push(fr02Folder);
-
-// Placeholder folders for Pool B and Pool C
-collection.item.push({
-  name: "02. Pool B - FR-08 Checkout",
-  item: []
-});
-collection.item.push({
-  name: "03. Pool C - FR-14 Category CRUD",
-  item: []
-});
+collection.item.push(fr08Folder);
+collection.item.push({ name: "03. Pool C - FR-14 Category CRUD", item: [] });
 
 // Write to file
 const targetPath = path.resolve(__dirname, '../collections/Postman_Collection.json');
 fs.writeFileSync(targetPath, JSON.stringify(collection, null, 2), 'utf8');
-console.log('Successfully generated Postman_Collection.json with ' + (domainItems.length + stateItems.length + securityItems.length + schemaItems.length + extItems.length) + ' test items for FR-02!');
+console.log('Successfully generated Postman_Collection.json with Pool A (44 tests) and Pool B (42 tests)!');

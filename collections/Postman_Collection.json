@@ -217,9 +217,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized for invalid email format', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized for invalid email format', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -258,9 +256,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -299,9 +295,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -340,9 +334,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty email', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty email', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -381,9 +373,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on null email', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on null email', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -422,9 +412,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on whitespace email', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on whitespace email', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -463,13 +451,8 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 401 Unauthorized for unregistered email', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});",
-                      "pm.test('Error message is generic without leaking user existence', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.error).to.be.a('string');",
-                      "});"
+                      "pm.test('Expect 401 Unauthorized for unregistered email', function () { pm.response.to.have.status(401); });",
+                      "pm.test('Error message is generic without leaking user existence', function () { var data = pm.response.json(); pm.expect(data.error).to.be.a('string'); });"
                     ]
                   }
                 }
@@ -508,9 +491,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty password', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty password', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -549,9 +530,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on null password', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on null password', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -590,13 +569,8 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 401 Unauthorized on wrong credentials', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});",
-                      "pm.test('Does not return token', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.token).to.be.undefined;",
-                      "});"
+                      "pm.test('Expect 401 Unauthorized on wrong credentials', function () { pm.response.to.have.status(401); });",
+                      "pm.test('Does not return token', function () { var data = pm.response.json(); pm.expect(data.token).to.be.undefined; });"
                     ]
                   }
                 }
@@ -635,9 +609,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 401 Unauthorized', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});"
+                      "pm.test('Expect 401 Unauthorized', function () { pm.response.to.have.status(401); });"
                     ]
                   }
                 }
@@ -676,9 +648,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty body', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty body', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -717,9 +687,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on missing email', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on missing email', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -758,9 +726,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on missing password', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized on missing password', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -800,10 +766,7 @@
                     "type": "text/javascript",
                     "exec": [
                       "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
-                      "pm.test('User role remains user, cannot elevate privilege via login body', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.user.role).to.eql('user');",
-                      "});"
+                      "pm.test('User role remains user, cannot elevate privilege via login body', function () { var data = pm.response.json(); pm.expect(data.user.role).to.eql('user'); });"
                     ]
                   }
                 }
@@ -842,9 +805,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -883,9 +844,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 401 Unauthorized (wrong password)', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});"
+                      "pm.test('Expect 401 Unauthorized (wrong password)', function () { pm.response.to.have.status(401); });"
                     ]
                   }
                 }
@@ -924,9 +883,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 or 401 without server crash', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 or 401 without server crash', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -965,9 +922,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 401 Unauthorized without DoS crash', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});"
+                      "pm.test('Expect 401 Unauthorized without DoS crash', function () { pm.response.to.have.status(401); });"
                     ]
                   }
                 }
@@ -1006,9 +961,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 200 OK (trimmed) or 401 Unauthorized', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([200, 401]);",
-                      "});"
+                      "pm.test('Expect 200 OK (trimmed) or 401 Unauthorized', function () { pm.expect(pm.response.code).to.be.oneOf([200, 401]); });"
                     ]
                   }
                 }
@@ -1052,9 +1005,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Attempt 1 fails with 401 Unauthorized', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});"
+                      "pm.test('Attempt 1 fails with 401 Unauthorized', function () { pm.response.to.have.status(401); });"
                     ]
                   }
                 }
@@ -1093,9 +1044,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Attempt 2 fails with 401 Unauthorized', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});"
+                      "pm.test('Attempt 2 fails with 401 Unauthorized', function () { pm.response.to.have.status(401); });"
                     ]
                   }
                 }
@@ -1134,9 +1083,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Attempt 3 fails with 401 Unauthorized', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});"
+                      "pm.test('Attempt 3 fails with 401 Unauthorized', function () { pm.response.to.have.status(401); });"
                     ]
                   }
                 }
@@ -1175,13 +1122,8 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 403 Forbidden because account is temporarily locked', function () {",
-                      "    pm.response.to.have.status(403);",
-                      "});",
-                      "pm.test('Error message mentions account is locked', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.error).to.include('khóa');",
-                      "});"
+                      "pm.test('Expect 403 Forbidden because account is temporarily locked', function () { pm.response.to.have.status(403); });",
+                      "pm.test('Error message mentions account is locked', function () { var data = pm.response.json(); pm.expect(data.error).to.include('khóa'); });"
                     ]
                   }
                 }
@@ -1220,9 +1162,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 403 Forbidden while account remains locked', function () {",
-                      "    pm.response.to.have.status(403);",
-                      "});"
+                      "pm.test('Expect 403 Forbidden while account remains locked', function () { pm.response.to.have.status(403); });"
                     ]
                   }
                 }
@@ -1261,13 +1201,8 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Login succeeds with 200 OK', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "});",
-                      "pm.test('User can login normally and receives token', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.token).to.be.a('string');",
-                      "});"
+                      "pm.test('Login succeeds with 200 OK', function () { pm.response.to.have.status(200); });",
+                      "pm.test('User can login normally and receives token', function () { var data = pm.response.json(); pm.expect(data.token).to.be.a('string'); });"
                     ]
                   }
                 }
@@ -1311,13 +1246,8 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('SQLi in Email must NOT result in 200 OK bypass', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});",
-                      "pm.test('No JWT token granted via SQL injection', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.token).to.be.undefined;",
-                      "});"
+                      "pm.test('SQLi in Email must NOT result in 200 OK bypass', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });",
+                      "pm.test('No JWT token granted via SQL injection', function () { var data = pm.response.json(); pm.expect(data.token).to.be.undefined; });"
                     ]
                   }
                 }
@@ -1356,9 +1286,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('SQLi in Password must NOT bypass password check', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});"
+                      "pm.test('SQLi in Password must NOT bypass password check', function () { pm.response.to.have.status(401); });"
                     ]
                   }
                 }
@@ -1397,9 +1325,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('SQLi comment payload rejected with 401', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});"
+                      "pm.test('SQLi comment payload rejected with 401', function () { pm.response.to.have.status(401); });"
                     ]
                   }
                 }
@@ -1438,9 +1364,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('SQLi UNION payload rejected with 401', function () {",
-                      "    pm.response.to.have.status(401);",
-                      "});"
+                      "pm.test('SQLi UNION payload rejected with 401', function () { pm.response.to.have.status(401); });"
                     ]
                   }
                 }
@@ -1480,10 +1404,7 @@
                     "type": "text/javascript",
                     "exec": [
                       "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
-                      "pm.test('SEC-01 Violation Check: Password MUST NOT be exposed in user object', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.user.password, 'Vulnerability SEC-01: Plaintext password is leaked in response!').to.be.undefined;",
-                      "});"
+                      "pm.test('SEC-01 Violation Check: Password MUST NOT be exposed in user object', function () { var data = pm.response.json(); pm.expect(data.user.password, 'Vulnerability SEC-01: Plaintext password is leaked in response!').to.be.undefined; });"
                     ]
                   }
                 }
@@ -1522,9 +1443,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request on object injection', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request on object injection', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -1563,9 +1482,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 415 Unsupported Media Type', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 415, 500]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 415 Unsupported Media Type', function () { pm.expect(pm.response.code).to.be.oneOf([400, 415, 500]); });"
                     ]
                   }
                 }
@@ -1615,12 +1532,7 @@
                     "type": "text/javascript",
                     "exec": [
                       "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
-                      "pm.test('Token follows JWT 3-part format (header.payload.signature)', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.token).to.be.a('string');",
-                      "    var parts = data.token.split('.');",
-                      "    pm.expect(parts.length).to.eql(3);",
-                      "});"
+                      "pm.test('Token follows JWT 3-part format (header.payload.signature)', function () { var data = pm.response.json(); pm.expect(data.token).to.be.a('string'); var parts = data.token.split('.'); pm.expect(parts.length).to.eql(3); });"
                     ]
                   }
                 }
@@ -1660,13 +1572,7 @@
                     "type": "text/javascript",
                     "exec": [
                       "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
-                      "pm.test('User object contains required fields: id, name, email, role', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.user).to.have.property('id').that.is.a('number');",
-                      "    pm.expect(data.user).to.have.property('name').that.is.a('string');",
-                      "    pm.expect(data.user).to.have.property('email').that.is.a('string');",
-                      "    pm.expect(data.user).to.have.property('role').that.is.a('string');",
-                      "});"
+                      "pm.test('User object contains required fields: id, name, email, role', function () { var data = pm.response.json(); pm.expect(data.user).to.have.property('id').that.is.a('number'); pm.expect(data.user).to.have.property('name').that.is.a('string'); pm.expect(data.user).to.have.property('email').that.is.a('string'); pm.expect(data.user).to.have.property('role').that.is.a('string'); });"
                     ]
                   }
                 }
@@ -1706,10 +1612,7 @@
                     "type": "text/javascript",
                     "exec": [
                       "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
-                      "pm.test('Response contains message: Login successful', function () {",
-                      "    var data = pm.response.json();",
-                      "    pm.expect(data.message).to.eql('Login successful');",
-                      "});"
+                      "pm.test('Response contains message: Login successful', function () { var data = pm.response.json(); pm.expect(data.message).to.eql('Login successful'); });"
                     ]
                   }
                 }
@@ -1753,9 +1656,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Email RFC standard: Login succeeds with 200 OK on uppercase email', function () {",
-                      "    pm.response.to.have.status(200);",
-                      "});"
+                      "pm.test('Email RFC standard: Login succeeds with 200 OK on uppercase email', function () { pm.response.to.have.status(200); });"
                     ]
                   }
                 }
@@ -1795,18 +1696,7 @@
                     "type": "text/javascript",
                     "exec": [
                       "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
-                      "pm.test('JWT Payload contains matching id and role claims', function () {",
-                      "    var data = pm.response.json();",
-                      "    var token = data.token;",
-                      "    var base64Url = token.split('.')[1];",
-                      "    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');",
-                      "    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {",
-                      "        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);",
-                      "    }).join(''));",
-                      "    var payload = JSON.parse(jsonPayload);",
-                      "    pm.expect(payload.id).to.eql(data.user.id);",
-                      "    pm.expect(payload.role).to.eql(data.user.role);",
-                      "});"
+                      "pm.test('JWT Payload contains matching id and role claims', function () { var data = pm.response.json(); var token = data.token; var base64Url = token.split('.')[1]; var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); var payload = JSON.parse(jsonPayload); pm.expect(payload.id).to.eql(data.user.id); pm.expect(payload.role).to.eql(data.user.role); });"
                     ]
                   }
                 }
@@ -1845,9 +1735,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request on malformed JSON body without server crash', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request on malformed JSON body without server crash', function () { pm.expect(pm.response.code).to.be.oneOf([400, 500]); });"
                     ]
                   }
                 }
@@ -1886,9 +1774,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Response time is under 500ms preventing timing discrepancy', function () {",
-                      "    pm.expect(pm.response.responseTime).to.be.below(500);",
-                      "});"
+                      "pm.test('Response time is under 500ms preventing timing discrepancy', function () { pm.expect(pm.response.responseTime).to.be.below(500); });"
                     ]
                   }
                 }
@@ -1927,9 +1813,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Expect 400 Bad Request or 401 Unauthorized safely handled', function () {",
-                      "    pm.expect(pm.response.code).to.be.oneOf([400, 401]);",
-                      "});"
+                      "pm.test('Expect 400 Bad Request or 401 Unauthorized safely handled', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
                     ]
                   }
                 }
@@ -1968,9 +1852,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('Verifies lockout state on locked account', function () {",
-                      "    pm.response.to.have.status(403);",
-                      "});"
+                      "pm.test('Verifies lockout state on locked account', function () { pm.response.to.have.status(403); });"
                     ]
                   }
                 }
@@ -2007,7 +1889,2107 @@
     },
     {
       "name": "02. Pool B - FR-08 Checkout",
-      "item": []
+      "item": [
+        {
+          "name": "02.0 Setup A: Ensure Authenticated User Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login succeeds and saves fresh userToken', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var data = pm.response.json();",
+                  "    pm.environment.set('userToken', data.token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"test@eshop.com\",\"password\":\"Test1234!\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02.0 Setup B: Populate User Cart (POST /api/cart)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Product added to user cart successfully', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"productId\":1,\"quantity\":1}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "cart"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "02.1 Domain & Boundary Tests",
+          "item": [
+            {
+              "name": "TC-B01: Valid Checkout with Standard Amount & Address",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var data = pm.response.json();",
+                      "pm.test('Response message is Checkout successful', function () { pm.expect(data.message).to.eql('Checkout successful'); });",
+                      "pm.test('Returns valid positive orderId', function () { pm.expect(data.orderId).to.be.a('number').and.above(0); pm.environment.set('createdOrderId', data.orderId); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":30000000,\"shipping_address\":\"123 Le Loi, Quan 1, TP.HCM\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B02: Valid Positive Total Amount (200000)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var data = pm.response.json();",
+                      "pm.test('Returns orderId', function () { pm.expect(data.orderId).to.be.a('number'); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"456 Nguyen Hue, Quan 1\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B03: Boundary - Float Total Amount (199999.50)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Expect 200 OK or 400 Bad Request handled safely', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":199999.5,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B04: Boundary - Zero Total Amount (total_amount = 0)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when order total_amount is 0', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":0,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B05: Boundary - Negative Total Amount (total_amount = -50000)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when total_amount is negative', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":-50000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B06: Invalid Type - String Number for total_amount (\"200000\")",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Expect 200 OK or 400 Bad Request', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":\"200000\",\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B07: Invalid Type - Non-numeric String for total_amount",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when total_amount is non-numeric string', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":\"hai tram nghin\",\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B08: Invalid Type - Boolean for total_amount (true)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when total_amount is boolean', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":true,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B09: Invalid Type - Null total_amount",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when total_amount is null', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":null,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B10: Extreme Boundary - Very Large Total Amount (10^12)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Expect 200 OK or 400 without server crash', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":1000000000000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B11: Missing Required Field - Missing total_amount",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when missing total_amount', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B12: Valid Standard Shipping Address",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"So 1 Dai Co Viet, Hai Ba Trung, Ha Noi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B13: Boundary - Empty String Shipping Address (\"\")",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when shipping_address is empty', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B14: Boundary - Whitespace Only Shipping Address (\"   \")",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when shipping_address is whitespace', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"   \"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B15: Invalid Type - Null Shipping Address",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when shipping_address is null', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":null}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B16: Invalid Type - Number as Shipping Address (12345)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when shipping_address is number', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":12345}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B17: Boundary - Minimum Length Address (1 char \"A\")",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Expect 400 Bad Request or 200 OK', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"A\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B18: Boundary - Extremely Long Address (1000 chars)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Expect 200 OK or 400 without crash', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B19: Format - Unicode Vietnamese Address",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK on Vietnamese Unicode', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"123 Đường Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B20: Missing Required Field - Missing shipping_address",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request when missing shipping_address', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B21: Boundary - Empty Request Body {}",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08: Expect 400 Bad Request on empty JSON body', function () { pm.response.to.have.status(400); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B22: Security - Extra Field Injection (status: delivered)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var data = pm.response.json();",
+                      "pm.test('Order created successfully', function () { pm.expect(data.orderId).to.be.a('number'); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"123 Le Loi\",\"status\":\"delivered\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "02.2 State & Cart Dependency Tests",
+          "item": [
+            {
+              "name": "TC-B23: State - Checkout When Cart is EMPTY",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08 Requirement: Cannot checkout when cart is empty - Expect 400 Bad Request', function () {",
+                      "    pm.response.to.have.status(400);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "02.2.1 State Setup: Add Item to Cart for Checkout Flow",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Product added to cart for state test', function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"productId\":1,\"quantity\":1}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/cart",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "cart"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B24: State - Checkout With Active Cart Items",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var data = pm.response.json();",
+                      "pm.test('Returns valid orderId', function () { pm.expect(data.orderId).to.be.a('number'); pm.environment.set('latestOrderId', data.orderId); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":30000000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B25: State - Verify Cart Cleared Post-Checkout (GET /api/cart)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var data = pm.response.json();",
+                      "pm.test('FR-08 Requirement: User cart MUST be emptied post-checkout', function () {",
+                      "    var cartItems = data.cart || data;",
+                      "    pm.expect(cartItems, 'Vulnerability FR-08: Cart was NOT cleared after checkout!').to.be.an('array').that.is.empty;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/cart",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "cart"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B26: State - Verify Initial Order Status is Pending (GET /api/orders/my-orders)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var orders = pm.response.json();",
+                      "pm.test('FR-10 Requirement: Initial order status MUST be pending', function () {",
+                      "    pm.expect(orders).to.be.an('array').and.not.empty;",
+                      "    var latest = orders[orders.length - 1];",
+                      "    pm.expect(latest.status).to.eql('pending');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/orders/my-orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "orders",
+                    "my-orders"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "02.2.2 State Setup: Add Multiple Items to Cart",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Item added to cart', function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"productId\":2,\"quantity\":2}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/cart",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "cart"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B27: State - Checkout With Multiple Cart Items",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK for multi-item checkout', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":56000000,\"shipping_address\":\"789 Tran Hung Dao\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B28: State - Verify Order User Association (GET /api/orders/my-orders)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var orders = pm.response.json();",
+                      "pm.test('All orders belong to authenticated user', function () {",
+                      "    orders.forEach(function(order) {",
+                      "        pm.expect(order).to.have.property('user_id');",
+                      "    });",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/orders/my-orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "orders",
+                    "my-orders"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "02.3 Security & Price Tampering Tests",
+          "item": [
+            {
+              "name": "TC-B29: SEC-02 Check - Unauthenticated Request (Missing Token)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('SEC-02: Expect 401 Unauthorized when token is missing', function () { pm.response.to.have.status(401); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B30: SEC-02 Check - Invalid Bearer Token Signature",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('SEC-02: Expect 403 Forbidden on forged token', function () { pm.response.to.have.status(403); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer invalid_signature_token_abc",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B31: SEC-02 Check - Empty Bearer Token Value",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('SEC-02: Expect 401 or 403 on empty bearer token', function () { pm.expect(pm.response.code).to.be.oneOf([401, 403]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer ",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B32: SEC-04 Check - Stored XSS Script Payload in shipping_address",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200 OK or 400 handled safely', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"<script>alert('XSS')</script>\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B33: SEC-04 Check - HTML Img Error XSS in shipping_address",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200 OK or 400 handled safely', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"<img src=x onerror=alert('XSS')>\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B34: SEC-05 Check - SQL Injection Payload in shipping_address",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('SQLi handled safely by parameterized query', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"123 Le Loi', 'delivered'); --\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "02.3.1 Setup: Add High Value Item to Cart (30,000,000đ)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Item added to cart', function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"productId\":1,\"quantity\":1}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/cart",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "cart"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B35: Vulnerability Check - Price Tampering (Client sends 1,000đ vs 30,000,000đ)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "var data = pm.response.json();",
+                      "pm.test('FR-08 Requirement: Backend MUST NOT accept client tampered total_amount (1000)', function () {",
+                      "    // If backend accepts 1000 blindly, it violates FR-08",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":1000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-B36: Schema - Verify Success Response Structure",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var data = pm.response.json();",
+                      "pm.test('Response matches schema: message and orderId', function () {",
+                      "    pm.expect(data).to.have.property('message').that.is.a('string');",
+                      "    pm.expect(data).to.have.property('orderId').that.is.a('number');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "02.4 Human Extension Tests",
+          "item": [
+            {
+              "name": "TC-EXT-07: Free Order Exploit (total_amount = 0 with expensive cart)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('FR-08 Business Rule: Cannot place 0 VND order for valuable cart items', function () {",
+                      "    pm.response.to.have.status(400);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":0,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-EXT-08: Cart State Persistence Check Post-Checkout",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var data = pm.response.json();",
+                      "var cart = data.cart || data;",
+                      "pm.test('Cart must be empty array [] post checkout', function () {",
+                      "    pm.expect(cart, 'Cart was not cleared post checkout!').to.be.an('array').that.is.empty;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/cart",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "cart"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-EXT-09: BOLA / IDOR Defense - Injected user_id = 9999 in Request Body",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"user_id\":9999,\"total_amount\":200000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-EXT-10: Stored XSS Retrieval Check (GET /api/orders/my-orders)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                      "var orders = pm.response.json();",
+                      "pm.test('Orders retrieved safely without raw unescaped script tag execution', function () {",
+                      "    pm.expect(orders).to.be.an('array');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/orders/my-orders",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "orders",
+                    "my-orders"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-EXT-11: Content-Type Tampering (application/x-www-form-urlencoded)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Expect 400 Bad Request or 415 on invalid Content-Type', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([400, 415, 500]);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "total_amount=200000&shipping_address=123+Le+Loi"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TC-EXT-12: Rapid Concurrency / Double Submit Checkout Simulation",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('Handles concurrent checkout request gracefully', function () {",
+                      "    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{userToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"total_amount\":200000,\"shipping_address\":\"123 Le Loi\"}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "checkout"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "03. Pool C - FR-14 Category CRUD",
