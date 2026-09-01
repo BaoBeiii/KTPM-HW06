@@ -4,8 +4,12 @@
   "description": "API Testing Suite for EShop SUT - Student 23127327",
   "scripts": {
     "start:backend": "node eshop-sut/backend/server.js",
-    "test:api": "newman run collections/Postman_Collection.json -e collections/Postman_Environment.json -r cli,htmlextra --reporter-htmlextra-export reports/newman_report.html"
+    "test:api": "newman run collections/Postman_Collection.json -e collections/Postman_Environment.json -r cli,htmlextra --reporter-htmlextra-export reports/newman_report.html",
+    "test:ci:pass": "newman run collections/Postman_Collection.json -e collections/Postman_Environment.json --folder \"00. Environment & Health Check\" -r cli,htmlextra --reporter-htmlextra-export reports/ci_pass_report.html",
+    "test:ci:fail": "newman run collections/Postman_Collection.json -e collections/Postman_Environment.json --folder \"02. Pool B - FR-08 Checkout\" -r cli,htmlextra --reporter-htmlextra-export reports/ci_fail_report.html",
+    "test:full": "newman run collections/Postman_Collection.json -e collections/Postman_Environment.json -r cli,htmlextra --reporter-htmlextra-export reports/newman_full_suite.html"
   },
+
   "devDependencies": {
     "newman": "^6.2.1",
     "newman-reporter-htmlextra": "^1.23.1"

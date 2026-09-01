@@ -1,0 +1,56 @@
+name: EShop Automated API Testing CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  api-testing:
+    name: Run Newman Automated API Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Project Dependencies
+        run: |
+          npm ci || npm install
+          cd eshop-sut/backend && npm install
+
+      - name: Initialize and Seed SQLite Database
+        run: |
+          node eshop-sut/backend/database.js
+
+      - name: Start SUT Backend Server in Background
+        run: |
+          node eshop-sut/backend/server.js &
+          echo "Waiting for SUT server to be healthy on port 3000..."
+          for i in {1..30}; do
+            if curl -s http://localhost:3000/api/products > /dev/null; then
+              echo "SUT backend is online and healthy!"
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Run Newman Automated Tests
+        run: |
+          npm run test:ci:pass
+
+      - name: Upload Newman HTML Test Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-test-report
+          path: reports/*.html
+          retention-days: 14
