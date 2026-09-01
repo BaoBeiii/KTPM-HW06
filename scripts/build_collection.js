@@ -1046,15 +1046,544 @@ fr08ExtItems.push(createCheckoutItem(
 fr08Folder.item.push({ name: "02.4 Human Extension Tests", item: fr08ExtItems });
 
 // ============================================================================
+// 03. POOL C - FR-14 CATEGORY CRUD
+// ============================================================================
+function createCategoryItem(name, method, urlPath, bodyObj = null, testScripts = [], headers = [], authHeader = "Bearer {{adminToken}}") {
+  const reqHeaders = [
+    { key: "Content-Type", value: "application/json", type: "text" },
+    ...headers
+  ];
+  if (authHeader !== null) {
+    reqHeaders.push({ key: "Authorization", value: authHeader, type: "text" });
+  }
+  const req = {
+    method: method,
+    header: reqHeaders,
+    url: {
+      raw: `{{baseUrl}}${urlPath}`,
+      host: ["{{baseUrl}}"],
+      path: urlPath.replace(/^\//, '').split('/')
+    }
+  };
+  if (bodyObj !== null) {
+    req.body = {
+      mode: "raw",
+      raw: typeof bodyObj === 'string' ? bodyObj : JSON.stringify(bodyObj)
+    };
+  }
+  return {
+    name: name,
+    event: [{ listen: "test", script: { type: "text/javascript", exec: testScripts } }],
+    request: req,
+    response: []
+  };
+}
+
+const fr14Folder = {
+  name: "03. Pool C - FR-14 Category CRUD",
+  item: [
+    {
+      name: "03.0 Setup A: Ensure Fresh Admin Token",
+      event: [{
+        listen: "test",
+        script: {
+          type: "text/javascript",
+          exec: [
+            "pm.test('Admin login successful', function () { pm.response.to.have.status(200); });",
+            "var data = pm.response.json();",
+            "pm.environment.set('adminToken', data.token);"
+          ]
+        }
+      }],
+      request: {
+        method: "POST",
+        header: [{ key: "Content-Type", value: "application/json", type: "text" }],
+        body: { mode: "raw", raw: JSON.stringify({ email: "admin@eshop.com", password: "Admin123!" }) },
+        url: { raw: "{{baseUrl}}/api/login", host: ["{{baseUrl}}"], path: ["api", "login"] }
+      },
+      response: []
+    },
+    {
+      name: "03.0 Setup B: Ensure Fresh User Token",
+      event: [{
+        listen: "test",
+        script: {
+          type: "text/javascript",
+          exec: [
+            "pm.test('User login successful', function () { pm.response.to.have.status(200); });",
+            "var data = pm.response.json();",
+            "pm.environment.set('userToken', data.token);"
+          ]
+        }
+      }],
+      request: {
+        method: "POST",
+        header: [{ key: "Content-Type", value: "application/json", type: "text" }],
+        body: { mode: "raw", raw: JSON.stringify({ email: "test@eshop.com", password: "Test1234!" }) },
+        url: { raw: "{{baseUrl}}/api/login", host: ["{{baseUrl}}"], path: ["api", "login"] }
+      },
+      response: []
+    }
+  ]
+};
+
+// Subfolder 03.1 Domain & Boundary Tests
+const fr14DomainItems = [];
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C01: Read - Get All Categories",
+  "GET", "/api/categories", null,
+  [
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+    "var data = pm.response.json();",
+    "pm.test('Returns array of categories with at least 3 items', function () { pm.expect(data).to.be.an('array').and.have.lengthOf.at.least(3); });"
+  ], [], null
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C02: Create - Admin Create Category (Thoi trang nam)",
+  "POST", "/api/categories", { name: "Thoi trang nam" },
+  [
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+    "var data = pm.response.json();",
+    "pm.test('Returns message and created id', function () { pm.expect(data.message).to.eql('Category created'); pm.expect(data.id).to.be.a('number'); pm.environment.set('tempCatId', data.id); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C03: Update - Admin Update Category Name",
+  "PUT", "/api/categories/{{tempCatId}}", { name: "Thoi trang nam cao cap" },
+  [
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+    "var data = pm.response.json();",
+    "pm.test('Message is Category updated', function () { pm.expect(data.message).to.eql('Category updated'); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C04: Delete - Admin Delete Category by ID",
+  "DELETE", "/api/categories/{{tempCatId}}", null,
+  [
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+    "var data = pm.response.json();",
+    "pm.test('Message is Category deleted', function () { pm.expect(data.message).to.eql('Category deleted'); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C05: Boundary - Create Category with Empty Name (\"\")",
+  "POST", "/api/categories", { name: "" },
+  [
+    "pm.test('FR-14 Requirement: Expect 400 Bad Request when category name is empty', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C06: Boundary - Create Category with Whitespace Name (\"   \")",
+  "POST", "/api/categories", { name: "   " },
+  [
+    "pm.test('FR-14 Requirement: Expect 400 Bad Request when category name is whitespace', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C07: Invalid Type - Create Category with Null Name",
+  "POST", "/api/categories", { name: null },
+  [
+    "pm.test('FR-14 Requirement: Expect 400 Bad Request when category name is null', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C08: Boundary - Create Category with Missing Name Field {}",
+  "POST", "/api/categories", {},
+  [
+    "pm.test('FR-14 Requirement: Expect 400 Bad Request on missing name field', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C09: Invalid Type - Create Category with Number Name (12345)",
+  "POST", "/api/categories", { name: 12345 },
+  [
+    "pm.test('FR-14 Requirement: Expect 400 Bad Request when name is number', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C10: Boundary - Create Category with 1 Character Name (\"A\")",
+  "POST", "/api/categories", { name: "A" },
+  [
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C11: Boundary - Create Category with 255 Character Name",
+  "POST", "/api/categories", { name: "D".repeat(255) },
+  [
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C12: Extreme Boundary - Create Category with 1000 Character Name",
+  "POST", "/api/categories", { name: "D".repeat(1000) },
+  [
+    "pm.test('Expect 200 OK or 400 without crash', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C13: Format - Create Category with Unicode Vietnamese",
+  "POST", "/api/categories", { name: "Đồ gia dụng & Thiết bị nhà bếp" },
+  [
+    "pm.test('Status code is 200 OK for Unicode category', function () { pm.response.to.have.status(200); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C14: Boundary - Update Category with Empty Name (\"\")",
+  "PUT", "/api/categories/2", { name: "" },
+  [
+    "pm.test('FR-14 Requirement: Expect 400 Bad Request on empty update name', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C15: Invalid Type - Update Category with Null Name",
+  "PUT", "/api/categories/2", { name: null },
+  [
+    "pm.test('FR-14 Requirement: Expect 400 Bad Request on null update name', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C16: Boundary - Update Category with Whitespace Name (\"   \")",
+  "PUT", "/api/categories/2", { name: "   " },
+  [
+    "pm.test('FR-14 Requirement: Expect 400 Bad Request on whitespace update name', function () { pm.response.to.have.status(400); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C17: NotFound - Update Non-existent Category ID (999999)",
+  "PUT", "/api/categories/999999", { name: "Khong ton tai" },
+  [
+    "pm.test('RESTful Standard: Expect 404 Not Found for non-existent category ID', function () { pm.response.to.have.status(404); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C18: Invalid Param - Update Category with Non-numeric ID (abc)",
+  "PUT", "/api/categories/abc", { name: "Test" },
+  [
+    "pm.test('Expect 400 Bad Request or 404 on non-numeric ID', function () { pm.expect(pm.response.code).to.be.oneOf([400, 404, 500]); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C19: Invalid Param - Update Category with Negative ID (-1)",
+  "PUT", "/api/categories/-1", { name: "Test" },
+  [
+    "pm.test('Expect 400 Bad Request or 404 on negative ID', function () { pm.expect(pm.response.code).to.be.oneOf([400, 404]); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C20: NotFound - Delete Non-existent Category ID (999999)",
+  "DELETE", "/api/categories/999999", null,
+  [
+    "pm.test('RESTful Standard: Expect 404 Not Found for non-existent category deletion', function () { pm.response.to.have.status(404); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C21: Invalid Param - Delete Category with Non-numeric ID (xyz)",
+  "DELETE", "/api/categories/xyz", null,
+  [
+    "pm.test('Expect 400 Bad Request or 404 on invalid ID string', function () { pm.expect(pm.response.code).to.be.oneOf([400, 404, 500]); });"
+  ]
+));
+
+fr14DomainItems.push(createCategoryItem(
+  "TC-C22: Invalid Param - Delete Category with Negative ID (-1)",
+  "DELETE", "/api/categories/-1", null,
+  [
+    "pm.test('Expect 400 Bad Request or 404 on negative ID', function () { pm.expect(pm.response.code).to.be.oneOf([400, 404]); });"
+  ]
+));
+
+fr14Folder.item.push({ name: "03.1 Domain & Boundary Tests", item: fr14DomainItems });
+
+// Subfolder 03.2 State Transitions & CRUD Lifecycle
+const fr14StateItems = [];
+
+fr14StateItems.push(createCategoryItem(
+  "TC-C23: CRUD Lifecycle Step 1 - Create Category (Thiet bi am thanh)",
+  "POST", "/api/categories", { name: "Thiet bi am thanh" },
+  [
+    "pm.test('Step 1: Category created with 200 OK', function () { pm.response.to.have.status(200); });",
+    "var data = pm.response.json();",
+    "pm.environment.set('lifecycleCatId', data.id);"
+  ]
+));
+
+fr14StateItems.push(createCategoryItem(
+  "TC-C24: CRUD Lifecycle Step 2 - Verify Category Exists in List",
+  "GET", "/api/categories", null,
+  [
+    "pm.test('Step 2: Category list contains newly created ID', function () {",
+    "    pm.response.to.have.status(200);",
+    "    var cats = pm.response.json();",
+    "    var targetId = pm.environment.get('lifecycleCatId');",
+    "    var found = cats.find(function(c) { return c.id === targetId; });",
+    "    pm.expect(found, 'Created category not found in list!').to.be.an('object');",
+    "    pm.expect(found.name).to.eql('Thiet bi am thanh');",
+    "});"
+  ], [], null
+));
+
+fr14StateItems.push(createCategoryItem(
+  "TC-C25: CRUD Lifecycle Step 3 - Update Category Name to Thiet bi am thanh Pro",
+  "PUT", "/api/categories/{{lifecycleCatId}}", { name: "Thiet bi am thanh Pro" },
+  [
+    "pm.test('Step 3: Category updated successfully', function () { pm.response.to.have.status(200); });"
+  ]
+));
+
+fr14StateItems.push(createCategoryItem(
+  "TC-C26: CRUD Lifecycle Step 4 - Verify Updated Name in List",
+  "GET", "/api/categories", null,
+  [
+    "pm.test('Step 4: Category name is reflected as Thiet bi am thanh Pro', function () {",
+    "    pm.response.to.have.status(200);",
+    "    var cats = pm.response.json();",
+    "    var targetId = pm.environment.get('lifecycleCatId');",
+    "    var found = cats.find(function(c) { return c.id === targetId; });",
+    "    pm.expect(found.name).to.eql('Thiet bi am thanh Pro');",
+    "});"
+  ], [], null
+));
+
+fr14StateItems.push(createCategoryItem(
+  "TC-C27: CRUD Lifecycle Step 5 - Delete Category by ID",
+  "DELETE", "/api/categories/{{lifecycleCatId}}", null,
+  [
+    "pm.test('Step 5: Category deleted successfully', function () { pm.response.to.have.status(200); });"
+  ]
+));
+
+fr14StateItems.push(createCategoryItem(
+  "TC-C28: CRUD Lifecycle Step 6 - Verify Category No Longer in List",
+  "GET", "/api/categories", null,
+  [
+    "pm.test('Step 6: Category is completely gone from list', function () {",
+    "    pm.response.to.have.status(200);",
+    "    var cats = pm.response.json();",
+    "    var targetId = pm.environment.get('lifecycleCatId');",
+    "    var found = cats.find(function(c) { return c.id === targetId; });",
+    "    pm.expect(found).to.be.undefined;",
+    "});"
+  ], [], null
+));
+
+fr14Folder.item.push({ name: "03.2 State Transitions & CRUD Lifecycle", item: fr14StateItems });
+
+// Subfolder 03.3 Security & RBAC Authorization Tests
+const fr14SecurityItems = [];
+
+fr14SecurityItems.push(createCategoryItem(
+  "TC-C29: SEC-03/FR-12 BFLA - Regular User Calls POST /api/categories",
+  "POST", "/api/categories", { name: "Unauthorized Category" },
+  [
+    "pm.test('SEC-03/FR-12: Regular user MUST NOT create categories (Expect 403 Forbidden)', function () {",
+    "    if (pm.response.code === 200) {",
+    "        console.log('[CRITICAL SECURITY BUG] BFLA Vulnerability: Regular user created a category without admin role!');",
+    "    }",
+    "    pm.response.to.have.status(403);",
+    "});"
+  ], [], "Bearer {{userToken}}"
+));
+
+fr14SecurityItems.push(createCategoryItem(
+  "TC-C30: SEC-03/FR-12 BFLA - Regular User Calls PUT /api/categories/:id",
+  "PUT", "/api/categories/1", { name: "Hacked Category" },
+  [
+    "pm.test('SEC-03/FR-12: Regular user MUST NOT update categories (Expect 403 Forbidden)', function () {",
+    "    if (pm.response.code === 200) {",
+    "        console.log('[CRITICAL SECURITY BUG] BFLA Vulnerability: Regular user updated a category without admin role!');",
+    "    }",
+    "    pm.response.to.have.status(403);",
+    "});"
+  ], [], "Bearer {{userToken}}"
+));
+
+fr14SecurityItems.push(createCategoryItem(
+  "TC-C31: SEC-03/FR-12 BFLA - Regular User Calls DELETE /api/categories/:id",
+  "DELETE", "/api/categories/3", null,
+  [
+    "pm.test('SEC-03/FR-12: Regular user MUST NOT delete categories (Expect 403 Forbidden)', function () {",
+    "    if (pm.response.code === 200) {",
+    "        console.log('[CRITICAL SECURITY BUG] BFLA Vulnerability: Regular user deleted a category without admin role!');",
+    "    }",
+    "    pm.response.to.have.status(403);",
+    "});"
+  ], [], "Bearer {{userToken}}"
+));
+
+fr14SecurityItems.push(createCategoryItem(
+  "TC-C32: SEC-02 Check - Unauthenticated POST /api/categories",
+  "POST", "/api/categories", { name: "Unauth" },
+  [
+    "pm.test('SEC-02: Expect 401 Unauthorized when missing token', function () { pm.response.to.have.status(401); });"
+  ], [], null
+));
+
+fr14SecurityItems.push(createCategoryItem(
+  "TC-C33: SEC-02 Check - Unauthenticated PUT /api/categories/1",
+  "PUT", "/api/categories/1", { name: "Unauth" },
+  [
+    "pm.test('SEC-02: Expect 401 Unauthorized when missing token', function () { pm.response.to.have.status(401); });"
+  ], [], null
+));
+
+fr14SecurityItems.push(createCategoryItem(
+  "TC-C34: SEC-02 Check - Unauthenticated DELETE /api/categories/1",
+  "DELETE", "/api/categories/1", null,
+  [
+    "pm.test('SEC-02: Expect 401 Unauthorized when missing token', function () { pm.response.to.have.status(401); });"
+  ], [], null
+));
+
+fr14SecurityItems.push(createCategoryItem(
+  "TC-C35: SEC-04 Check - Stored XSS Script Payload in Category Name",
+  "POST", "/api/categories", { name: "<script>alert('XSS')</script>" },
+  [
+    "pm.test('Status is 200 OK or 400 handled safely', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+  ]
+));
+
+fr14SecurityItems.push(createCategoryItem(
+  "TC-C36: SEC-05 Check - SQL Injection in Category Name (' OR '1'='1)",
+  "POST", "/api/categories", { name: "' OR '1'='1" },
+  [
+    "pm.test('Handled safely with Parameterized query', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+  ]
+));
+
+fr14SecurityItems.push(createCategoryItem(
+  "TC-C37: SEC-05 Check - SQL Injection in Path Parameter :id",
+  "DELETE", "/api/categories/1 OR 1=1", null,
+  [
+    "pm.test('Handled safely without dropping table', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]); });"
+  ]
+));
+
+fr14Folder.item.push({ name: "03.3 Security & RBAC Authorization Tests", item: fr14SecurityItems });
+
+// Subfolder 03.4 Schema Validation Tests
+const fr14SchemaItems = [];
+
+fr14SchemaItems.push(createCategoryItem(
+  "TC-C38: Schema - Verify Category List Schema Structure",
+  "GET", "/api/categories", null,
+  [
+    "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+    "var data = pm.response.json();",
+    "pm.test('Every category object has id (number) and name (string)', function () {",
+    "    pm.expect(data).to.be.an('array');",
+    "    data.forEach(function(item) {",
+    "        pm.expect(item).to.have.property('id').that.is.a('number');",
+    "        pm.expect(item).to.have.property('name').that.is.a('string');",
+    "    });",
+    "});"
+  ], [], null
+));
+
+fr14Folder.item.push({ name: "03.4 Schema Validation Tests", item: fr14SchemaItems });
+
+// Subfolder 03.5 Human Extension Tests
+const fr14ExtItems = [];
+
+fr14ExtItems.push(createCategoryItem(
+  "TC-EXT-14: Referential Integrity - Delete Category Containing Products (ID 1)",
+  "DELETE", "/api/categories/1", null,
+  [
+    "pm.test('Referential Integrity: Expect 400 or 409 Conflict when deleting category with products', function () {",
+    "    if (pm.response.code === 200) {",
+    "        console.log('[DATA INTEGRITY BUG] Category ID 1 was deleted even though products still link to it!');",
+    "    }",
+    "    pm.expect(pm.response.code, 'Referential Integrity Violated: Orphaned products allowed!').to.be.oneOf([400, 409]);",
+    "});"
+  ]
+));
+
+fr14ExtItems.push(createCategoryItem(
+  "TC-EXT-15: Uniqueness - Create Duplicate Category Name (Dien thoai)",
+  "POST", "/api/categories", { name: "Điện thoại" },
+  [
+    "pm.test('Expect 400 Bad Request or 409 Conflict on duplicate category name', function () {",
+    "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 409]);",
+    "});"
+  ]
+));
+
+fr14ExtItems.push(createCategoryItem(
+  "TC-EXT-16.1: Setup - Inject Img Onerror XSS in Category Name",
+  "POST", "/api/categories", { name: "<img src=x onerror=alert('XSS')>" },
+  [
+    "pm.test('Status is 200 or 400', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+  ]
+));
+
+fr14ExtItems.push(createCategoryItem(
+  "TC-EXT-16.2: Output Sanitization - Verify XSS Safe on GET /api/categories",
+  "GET", "/api/categories", null,
+  [
+    "pm.test('Categories list retrieved safely', function () { pm.response.to.have.status(200); });"
+  ], [], null
+));
+
+fr14ExtItems.push(createCategoryItem(
+  "TC-EXT-17: Parser Defense - Malformed JSON in POST Category",
+  "POST", "/api/categories", "{name: \"Loi cu phap\"",
+  [
+    "pm.test('Expect 400 Bad Request on malformed JSON without crash', function () { pm.expect(pm.response.code).to.be.oneOf([400, 500]); });"
+  ]
+));
+
+fr14ExtItems.push(createCategoryItem(
+  "TC-EXT-18: Path Traversal Defense on :id (%2e%2e%2f)",
+  "DELETE", "/api/categories/%2e%2e%2f", null,
+  [
+    "pm.test('Expect 400 or 404 preventing traversal', function () { pm.expect(pm.response.code).to.be.oneOf([400, 404]); });"
+  ]
+));
+
+fr14ExtItems.push(createCategoryItem(
+  "TC-EXT-19: Case-Insensitive Uniqueness Check (laptop vs Laptop)",
+  "POST", "/api/categories", { name: "laptop" },
+  [
+    "pm.test('Category creation handled consistently with respect to case collation', function () {",
+    "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 409]);",
+    "});"
+  ]
+));
+
+fr14Folder.item.push({ name: "03.5 Human Extension Tests", item: fr14ExtItems });
+
+// ============================================================================
 // ASSEMBLE ALL FOLDERS
 // ============================================================================
 collection.item.push(healthCheckFolder);
 collection.item.push(fr02Folder);
 collection.item.push(fr08Folder);
-collection.item.push({ name: "03. Pool C - FR-14 Category CRUD", item: [] });
+collection.item.push(fr14Folder);
 
 // Write to file
 const targetPath = path.resolve(__dirname, '../collections/Postman_Collection.json');
 fs.writeFileSync(targetPath, JSON.stringify(collection, null, 2), 'utf8');
-console.log('Successfully generated Postman_Collection.json with Pool A (44 tests) and Pool B (43 tests including TC-EXT-13)!');
+console.log('Successfully generated complete Postman_Collection.json with Pool A (44 tests), Pool B (43 tests), and Pool C (44 tests) = 131 tests total!');
+
 

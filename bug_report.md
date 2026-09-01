@@ -159,4 +159,72 @@
 - **Kết quả thực tế (Actual Result):** Cả 2 request đều trả về `200 OK`, hai đơn hàng độc lập được tạo ra cho cùng một món hàng duy nhất.
 - **Kết quả mong đợi (Expected Result):** Khi số lượng còn 1, chỉ người thanh toán trước được chấp nhận (`200 OK`), người thanh toán sau phải bị từ chối với mã lỗi `400 Bad Request` ("Sản phẩm đã hết hàng / Out of stock"); tồn kho không được phép giảm về âm.
 
+---
+
+### BUG-10: Lỗ hổng Phân quyền Broken Function Level Authorization (BFLA) trên các Endpoint Quản lý Danh mục
+- **Mã lỗi:** `BUG-10`
+- **API bị ảnh hưởng:** `POST /api/categories`, `PUT /api/categories/:id`, `DELETE /api/categories/:id` (FR-14 & SEC-03)
+- **Mức độ nghiêm trọng:** `Critical (Broken Access Control / OWASP Top 10 API1:2023)`
+- **Mô tả:** Theo đặc tả phân hệ Admin (FR-12 & SEC-03), các tác vụ thêm, sửa, xóa danh mục chỉ được phép thực hiện bởi người dùng có vai trò Quản trị viên (`role === 'admin'`). Tuy nhiên, trên hệ thống SUT:
+  - Bất kỳ người dùng thông thường nào (`role: 'user'`) chỉ cần có JWT token hợp lệ đều có thể tạo mới, cập nhật tên hoặc xóa sạch các danh mục của hệ thống.
+  - Server hoàn toàn không kiểm tra `req.user.role === 'admin'`, trả về `200 OK` cho mọi thao tác phá hoại của người dùng bình thường.
+- **Nguyên nhân kỹ thuật:** Các route `/api/categories` trong `server.js` (dòng 249, 257, 269) chỉ sử dụng middleware `authenticateToken` để kiểm tra chữ ký JWT, hoàn toàn thiếu middleware kiểm tra phân quyền Admin (Role-Based Authorization middleware).
+- **Các bước tái hiện (Steps to Reproduce):**
+  1. Đăng nhập tài khoản người dùng thông thường: `POST /api/login` với `test@eshop.com`.
+  2. Dùng token nhận được để gửi request `POST /api/categories` với `{"name": "Unauthorized Category"}`.
+  3. Dùng token đó gửi request `DELETE /api/categories/3`.
+- **Kết quả thực tế (Actual Result):** Server trả về `200 OK`, tạo danh mục mới và xóa danh mục số 3 thành công bởi user không có quyền Admin.
+- **Kết quả mong đợi (Expected Result):** Server phải từ chối truy cập và trả về HTTP `403 Forbidden` ("Yêu cầu quyền Quản trị viên").
+
+---
+
+### BUG-11: Thiếu hoàn toàn Validation Dữ liệu Tên Danh mục trên POST và PUT /api/categories
+- **Mã lỗi:** `BUG-11`
+- **API bị ảnh hưởng:** `POST /api/categories`, `PUT /api/categories/:id` (FR-14)
+- **Mức độ nghiêm trọng:** `Major (Input Validation Flaw)`
+- **Mô tả:** Hệ thống không kiểm tra tính hợp lệ của trường `name` khi tạo hoặc cập nhật danh mục:
+  - Chấp nhận tạo/sửa danh mục với tên là chuỗi rỗng `""`.
+  - Chấp nhận tên chỉ chứa toàn dấu khoảng trắng `"   "`.
+  - Chấp nhận giá trị `null` hoặc body rỗng `{}` (khiến cột `name` trong CSDL bị lưu thành `NULL`).
+  - Chấp nhận tên là kiểu số `12345`.
+- **Nguyên nhân kỹ thuật:** Trong hàm xử lý `POST` và `PUT` tại `server.js` (dòng 249-267), biến `{ name } = req.body` được truyền trực tiếp vào câu lệnh SQL mà không qua bất kỳ bước kiểm tra điều kiện `if (!name || typeof name !== 'string' || name.trim() === '')`.
+- **Các bước tái hiện (Steps to Reproduce):**
+  1. Đăng nhập tài khoản Admin.
+  2. Gửi request `POST /api/categories` với body `{"name": ""}` hoặc `{"name": null}`.
+- **Kết quả thực tế (Actual Result):** Trả về `200 OK` kèm `id` và lưu một dòng có tên rỗng/null vào CSDL.
+- **Kết quả mong đợi (Expected Result):** Trả về `400 Bad Request` với thông báo "Tên danh mục không được để trống".
+
+---
+
+### BUG-12: Vi phạm Chuẩn RESTful — Endpoint PUT và DELETE luôn trả về 200 OK khi ID Danh mục không tồn tại
+- **Mã lỗi:** `BUG-12`
+- **API bị ảnh hưởng:** `PUT /api/categories/:id`, `DELETE /api/categories/:id` (FR-14)
+- **Mức độ nghiêm trọng:** `Medium (RESTful Semantic Flaw)`
+- **Mô tả:** Khi client gửi request cập nhật hoặc xóa một danh mục với `id` không hề tồn tại trong cơ sở dữ liệu (ví dụ: `id = 999999`):
+  - Server vẫn trả về HTTP `200 OK` với thông báo `"Category updated"` hoặc `"Category deleted"`.
+  - Trạng thái phản hồi này đánh lừa client rằng tài nguyên đã được thao tác thành công, vi phạm nguyên tắc thiết kế RESTful API tiêu chuẩn.
+- **Nguyên nhân kỹ thuật:** Trong callback của `db.run("UPDATE ...")` và `db.run("DELETE ...")` tại `server.js` (dòng 263, 274), hệ thống không kiểm tra thuộc tính `this.changes`. Khi `this.changes === 0`, server vẫn mặc định gửi `res.json(...)` với mã trạng thái 200 thay vì kiểm tra và trả về 404.
+- **Các bước tái hiện (Steps to Reproduce):**
+  1. Gửi request `DELETE /api/categories/999999` với header token hợp lệ.
+  2. Gửi request `PUT /api/categories/999999` với `{"name": "Non-existent"}`.
+- **Kết quả thực tế (Actual Result):** Cả hai request đều nhận HTTP `200 OK`.
+- **Kết quả mong đợi (Expected Result):** Phải trả về HTTP `404 Not Found` kèm thông báo "Danh mục không tồn tại".
+
+---
+
+### BUG-13: Vi phạm Tính Toàn Vẹn Quan Hệ (Referential Integrity) khi Xóa Danh mục Đang Chứa Sản phẩm
+- **Mã lỗi:** `BUG-13`
+- **API bị ảnh hưởng:** `DELETE /api/categories/:id` (FR-14)
+- **Mức độ nghiêm trọng:** `Major (Data Integrity Flaw)`
+- **Mô tả:** Hệ thống cho phép xóa trực tiếp danh mục (ví dụ danh mục ID 1 "Điện thoại") trong khi vẫn còn nhiều sản phẩm trong bảng `products` đang liên kết với danh mục này (`category_id = 1`, ví dụ iPhone 15, Samsung Galaxy S24):
+  - Sau khi xóa, các sản phẩm này vẫn tồn tại nhưng có `category_id` trỏ vào một ID không còn tồn tại trong bảng `categories`.
+  - Điều này tạo ra các bản ghi mồ côi (Orphaned Records) trong CSDL, gây lỗi phân loại sản phẩm trên giao diện người dùng và hỏng cấu trúc dữ liệu liên kết.
+- **Nguyên nhân kỹ thuật:** `DELETE /api/categories/:id` tại `server.js` không thực hiện truy vấn kiểm tra `SELECT COUNT(*) FROM products WHERE category_id = ?` trước khi xóa, đồng thời cơ chế khóa ngoại `PRAGMA foreign_keys = ON;` không được cấu hình chặt chẽ trong SQLite.
+- **Các bước tái hiện (Steps to Reproduce):**
+  1. Gửi request `DELETE /api/categories/1`.
+  2. Gửi request `GET /api/products` kiểm tra các sản phẩm có `category_id = 1`.
+- **Kết quả thực tế (Actual Result):** Danh mục 1 bị xóa thành công (`200 OK`), các sản phẩm vẫn trỏ vào `category_id = 1` nhưng danh mục đã biến mất.
+- **Kết quả mong đợi (Expected Result):** Server phải từ chối xóa và trả về HTTP `400 Bad Request` hoặc `409 Conflict` kèm thông báo "Không thể xóa danh mục đang có sản phẩm liên kết".
+
+
 

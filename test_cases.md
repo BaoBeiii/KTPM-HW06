@@ -147,4 +147,86 @@ Dưới đây là **7 ca kiểm thử chuyên sâu** do con người bổ sung m
 - **Số ca kiểm thử mở rộng bởi con người:** 7 ca kiểm thử (bổ sung TC-EXT-13 kiểm thử tồn kho & Overselling)
 - **Tổng số ca kiểm thử thực thi cho API 2:** **43 ca kiểm thử**
 
+---
+
+# 3. API 3: FR-14 Quản Lý Danh Mục CRUD (`/api/categories`)
+
+## 3.1. Tập Ca Kiểm Thử Sinh Bởi AI (AI-Generated Test Cases) & Kết Quả Thẩm Định (Human Audit)
+
+| Test ID | Phân loại | Tên ca kiểm thử | Dữ liệu đầu vào (Method, Endpoint & Body) | Kỳ vọng theo Đặc tả (Expected Result) | Thẩm định (Human Audit) | Lý do & Hiệu chỉnh (Reasoning & Correction) |
+| :--- | :--- | :--- | :--- | :--- | :---: | :--- |
+| **TC-C01** | Domain (Read) | Lấy danh sách toàn bộ danh mục | `GET /api/categories` | 200 OK, trả về mảng các đối tượng `[{id, name}]` | **VALID** | Phù hợp mục 3.4 đặc tả API. |
+| **TC-C02** | Domain (Create) | Admin tạo mới danh mục hợp lệ | `POST /api/categories` body `{"name": "Thời trang nam"}` | 200 OK, `message: "Category created"`, `id` là số nguyên dương | **VALID** | Luồng chuẩn tạo danh mục của Admin. |
+| **TC-C03** | Domain (Update) | Admin cập nhật tên danh mục theo ID | `PUT /api/categories/:id` body `{"name": "Thời trang nam cao cấp"}` | 200 OK, `message: "Category updated"` | **VALID** | Luồng chuẩn sửa tên danh mục. |
+| **TC-C04** | Domain (Delete) | Admin xóa danh mục theo ID | `DELETE /api/categories/:id` | 200 OK, `message: "Category deleted"` | **VALID** | Luồng chuẩn xóa danh mục. |
+| **TC-C05** | Domain (Boundary) | Tạo danh mục với tên là chuỗi rỗng `""` | `POST /api/categories` body `{"name": ""}` | 400 Bad Request ("Tên danh mục không được để trống") | **VALID** | Ràng buộc FR-14: Tên danh mục bắt buộc nhập. |
+| **TC-C06** | Domain (Boundary) | Tạo danh mục với tên chỉ chứa khoảng trắng `"   "` | `POST /api/categories` body `{"name": "   "}` | 400 Bad Request | **VALID** | Khoảng trắng không phải tên hợp lệ. |
+| **TC-C07** | Domain (Invalid) | Tạo danh mục với tên nhận giá trị `null` | `POST /api/categories` body `{"name": null}` | 400 Bad Request | **VALID** | Bắt buộc kiểu string cho tên danh mục. |
+| **TC-C08** | Domain (Boundary) | Tạo danh mục thiếu trường `name` trong body `{}` | `POST /api/categories` body `{}` | 400 Bad Request | **VALID** | Thiếu trường bắt buộc trong schema. |
+| **TC-C09** | Domain (Invalid) | Tạo danh mục với tên là kiểu số `12345` | `POST /api/categories` body `{"name": 12345}` | 400 Bad Request | **VALID** | Sai kiểu dữ liệu trường name. |
+| **TC-C10** | Boundary (Length) | Tạo danh mục với tên độ dài tối thiểu 1 ký tự (`"A"`) | `POST /api/categories` body `{"name": "A"}` | 200 OK | **VALID** | Kiểm tra giá trị biên dưới độ dài tên. |
+| **TC-C11** | Boundary (Length) | Tạo danh mục với tên chuẩn 255 ký tự | `POST /api/categories` body `{"name": "D".repeat(255)}` | 200 OK | **VALID** | Kiểm tra giá trị biên trên độ dài tên. |
+| **TC-C12** | Boundary (Length) | Tạo danh mục với tên cực dài (1000 ký tự) | `POST /api/categories` body `{"name": "D".repeat(1000)}` | 400 Bad Request hoặc 200 OK | **VALID** | Kiểm tra xử lý chuỗi cực lớn trong database. |
+| **TC-C13** | Domain (Format) | Tạo danh mục với tiếng Việt có dấu Unicode | `POST /api/categories` body `{"name": "Đồ gia dụng & Thiết bị nhà bếp"}` | 200 OK | **VALID** | Hỗ trợ tiếng Việt UTF-8 chuẩn. |
+| **TC-C14** | Domain (Boundary) | Cập nhật danh mục với tên rỗng `""` | `PUT /api/categories/:id` body `{"name": ""}` | 400 Bad Request | **VALID** | Không cho phép cập nhật tên thành rỗng. |
+| **TC-C15** | Domain (Invalid) | Cập nhật danh mục với tên nhận giá trị `null` | `PUT /api/categories/:id` body `{"name": null}` | 400 Bad Request | **VALID** | Ngăn chặn gán giá trị null cho tên. |
+| **TC-C16** | Domain (Boundary) | Cập nhật danh mục với tên chỉ chứa khoảng trắng | `PUT /api/categories/:id` body `{"name": "   "}` | 400 Bad Request | **VALID** | Tên cập nhật không được toàn dấu cách. |
+| **TC-C17** | Domain (NotFound) | Cập nhật danh mục với ID không tồn tại (`999999`) | `PUT /api/categories/999999` body `{"name": "Không tồn tại"}` | 404 Not Found | **VALID** | Ràng buộc RESTful: tài nguyên không tồn tại phải trả về 404. |
+| **TC-C18** | Domain (Invalid) | Cập nhật danh mục với ID không phải số (`abc`) | `PUT /api/categories/abc` body `{"name": "Test"}` | 400 Bad Request | **VALID** | URL param `:id` phải là số nguyên. |
+| **TC-C19** | Domain (Invalid) | Cập nhật danh mục với ID là số âm (`-1`) | `PUT /api/categories/-1` body `{"name": "Test"}` | 400 Bad Request hoặc 404 Not Found | **VALID** | ID không thể là số âm. |
+| **TC-C20** | Domain (NotFound) | Xóa danh mục với ID không tồn tại (`999999`) | `DELETE /api/categories/999999` | 404 Not Found | **VALID** | Xóa tài nguyên không tồn tại phải trả về 404. |
+| **TC-C21** | Domain (Invalid) | Xóa danh mục với ID không phải số (`xyz`) | `DELETE /api/categories/xyz` | 400 Bad Request | **VALID** | ID không hợp lệ trong URL path. |
+| **TC-C22** | Domain (Invalid) | Xóa danh mục với ID là số âm (`-1`) | `DELETE /api/categories/-1` | 400 Bad Request hoặc 404 Not Found | **VALID** | ID âm không hợp lệ. |
+| **TC-C23** | State (Lifecycle) | Chu kỳ CRUD Bước 1: Admin tạo mới danh mục | `POST /api/categories` body `{"name": "Thiết bị âm thanh"}` | 200 OK, lưu lại `createdCatId` | **VALID** | Bắt đầu vòng đời tài nguyên. |
+| **TC-C24** | State (Lifecycle) | Chu kỳ CRUD Bước 2: Đọc danh sách xác minh danh mục mới có mặt | `GET /api/categories` | 200 OK, mảng chứa danh mục có ID = `createdCatId` | **VALID** | Kiểm tra tính bền vững của thao tác ghi. |
+| **TC-C25** | State (Lifecycle) | Chu kỳ CRUD Bước 3: Cập nhật tên danh mục vừa tạo | `PUT /api/categories/:createdCatId` body `{"name": "Thiết bị âm thanh Pro"}` | 200 OK, `message: "Category updated"` | **VALID** | Thao tác cập nhật trạng thái. |
+| **TC-C26** | State (Lifecycle) | Chu kỳ CRUD Bước 4: Đọc lại danh sách xác minh tên đã đổi | `GET /api/categories` | 200 OK, danh mục mang tên "Thiết bị âm thanh Pro" | **VALID** | Kiểm tra tính nhất quán sau update. |
+| **TC-C27** | State (Lifecycle) | Chu kỳ CRUD Bước 5: Xóa danh mục vừa tạo | `DELETE /api/categories/:createdCatId` | 200 OK, `message: "Category deleted"` | **VALID** | Thao tác xóa tài nguyên. |
+| **TC-C28** | State (Lifecycle) | Chu kỳ CRUD Bước 6: Đọc lại danh sách xác minh danh mục đã biến mất | `GET /api/categories` | 200 OK, danh mục không còn xuất hiện trong mảng | **VALID** | Đảm bảo tài nguyên bị xóa hoàn toàn khỏi DB. |
+| **TC-C29** | Security (SEC-03) | BFLA Check: User thường gọi `POST /api/categories` | Header `Authorization: Bearer {{userToken}}` | 403 Forbidden ("Yêu cầu quyền Admin") | **VALID** | Ràng buộc nghiêm ngặt FR-12 & SEC-03: Phân hệ Admin chỉ dành cho Admin. |
+| **TC-C30** | Security (SEC-03) | BFLA Check: User thường gọi `PUT /api/categories/:id` | Header `Authorization: Bearer {{userToken}}` | 403 Forbidden | **VALID** | Ngăn chặn user thường sửa đổi dữ liệu quản trị. |
+| **TC-C31** | Security (SEC-03) | BFLA Check: User thường gọi `DELETE /api/categories/:id` | Header `Authorization: Bearer {{userToken}}` | 403 Forbidden | **VALID** | Ngăn chặn user thường xóa danh mục hệ thống. |
+| **TC-C32** | Security (SEC-02) | Unauthenticated: Gọi `POST /api/categories` không truyền token | Không có Authorization header | 401 Unauthorized | **VALID** | Bắt buộc xác thực theo SEC-02. |
+| **TC-C33** | Security (SEC-02) | Unauthenticated: Gọi `PUT /api/categories/:id` không truyền token | Không có Authorization header | 401 Unauthorized | **VALID** | Bắt buộc xác thực theo SEC-02. |
+| **TC-C34** | Security (SEC-02) | Unauthenticated: Gọi `DELETE /api/categories/:id` không truyền token | Không có Authorization header | 401 Unauthorized | **VALID** | Bắt buộc xác thực theo SEC-02. |
+| **TC-C35** | Security (SEC-04) | Stored XSS Script Payload trong trường `name` | `POST /api/categories` body `{"name": "<script>alert('XSS')</script>"}` | Dữ liệu được sanitize/escape an toàn | **VALID** | Tuân thủ yêu cầu SEC-04: chống XSS lưu trữ. |
+| **TC-C36** | Security (SEC-05) | SQL Injection trong trường `name` (`' OR '1'='1`) | `POST /api/categories` body `{"name": "' OR '1'='1"}` | Được xử lý bằng Parameterized query an toàn | **VALID** | Kiểm tra phòng thủ SQLi theo SEC-05. |
+| **TC-C37** | Security (SEC-05) | SQL Injection trong URL Path Parameter `:id` | `DELETE /api/categories/1 OR 1=1` | 400 Bad Request hoặc từ chối an toàn, không xóa toàn bộ bảng | **VALID** | Ngăn ngừa SQLi trong URL path. |
+| **TC-C38** | Schema (Category) | Kiểm định Schema chi tiết của danh sách categories | `GET /api/categories` | Mỗi phần tử trong mảng có đúng `{id: number, name: string}` | **VALID** | Khớp 100% schema mục 3.4 đặc tả API. |
+
+---
+
+## 3.2. Các Ca Kiểm Thử Mở Rộng Do Con Người Thiết Kế (Human Extensions)
+
+Dưới đây là **6 ca kiểm thử chuyên sâu** do con người bổ sung mà AI ban đầu bỏ sót:
+
+| Test ID | Tên ca kiểm thử mở rộng | Request Body / Kịch bản thực thi | Kết quả mong đợi theo Đặc tả | Lý do AI bỏ sót (Why AI Missed It) |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-EXT-14** | Kiểm tra toàn vẹn quan hệ (Referential Integrity Check): Xóa danh mục đang chứa sản phẩm | Gọi `DELETE /api/categories/1` (Danh mục "Điện thoại" đang chứa iPhone 15, Galaxy S24) | 400 Bad Request hoặc 409 Conflict ("Không thể xóa danh mục đang có sản phẩm liên kết"). | **AI bỏ sót ràng buộc toàn vẹn cơ sở dữ liệu (Foreign Key Constraints):** AI chỉ kiểm thử xóa danh mục rỗng tự tạo, không kiểm thử tác động dây chuyền lên bảng `products`. |
+| **TC-EXT-15** | Trùng lặp tên danh mục (Duplicate Category Name Handling) | Tạo 2 danh mục cùng mang tên "Điện thoại thông minh" | Hệ thống từ chối hoặc cảnh báo trùng lặp, không tạo danh mục trùng tên gây phân mảnh dữ liệu. | **AI thiếu tư duy nghiệp vụ thương mại:** AI chỉ kiểm tra cú pháp tên hợp lệ, bỏ qua tính duy nhất (Uniqueness business rule) của tên danh mục sản phẩm. |
+| **TC-EXT-16** | Kiểm tra Stored XSS khi đọc lại danh mục (GET Sanitization Verification) | Tạo danh mục chứa `<img src=x onerror=alert('XSS')>` $\rightarrow$ Gọi `GET /api/categories` kiểm tra chuỗi trả về | Chuỗi trong JSON phản hồi phải được escape hoặc sanitize an toàn trước khi trả về client. | **AI thiếu kiểm thử vòng đời hiển thị:** AI chỉ gửi payload vào POST mà không kiểm tra quá trình parse và render ở endpoint GET. |
+| **TC-EXT-17** | Phòng thủ Malformed JSON trong POST Category | Gửi chuỗi body lỗi cú pháp: `{name: "Danh mục lỗi"` | 400 Bad Request an toàn, không gây crash server hay lộ stack trace. | **AI luôn mặc định dữ liệu đầu vào có format hoàn hảo.** |
+| **TC-EXT-18** | Path Traversal / URL Encoded Parameter Injection trên `:id` | Gọi `DELETE /api/categories/%2e%2e%2f` hoặc `/api/categories/..` | 400 Bad Request hoặc 404 Not Found, ngăn ngừa điều hướng thư mục. | **AI chỉ kiểm tra các giá trị số cơ bản cho tham số đường dẫn.** |
+| **TC-EXT-19** | Phân biệt hoa thường khi kiểm tra trùng tên danh mục (Case-Insensitive Uniqueness) | Danh mục "Laptop" đã tồn tại $\rightarrow$ Tạo mới "laptop" | Hệ thống xử lý thông minh để tránh trùng lặp do khác biệt chữ hoa chữ thường. | **AI bỏ qua vấn đề Collation và Encoding trong cơ sở dữ liệu.** |
+
+---
+
+## 3.3. Tổng Kết Số Lượng Ca Kiểm Thử API 3:
+- **Số ca kiểm thử do AI sinh ra:** 38 ca kiểm thử
+- **Số ca kiểm thử được thẩm định:** 38 ca kiểm thử (38 VALID)
+- **Số ca kiểm thử mở rộng bởi con người:** 6 ca kiểm thử
+- **Tổng số ca kiểm thử thực thi cho API 3:** **44 ca kiểm thử**
+
+---
+
+# 4. Bảng Tổng Hợp Số Lượng Ca Kiểm Thử Toàn Bộ Đồ Án (HW06 Test Suite)
+
+| Phân hệ / API | Endpoint chính | AI-Generated | Human Audit (Passed/Adjusted) | Human Extensions | Tổng ca kiểm thử thực tế |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **API 1 (Pool A - FR-02)** | `POST /api/login` | 38 | 38 (36 V / 2 I) | 6 | **44** |
+| **API 2 (Pool B - FR-08)** | `POST /api/checkout` | 36 | 36 (34 V / 2 I) | 7 | **43** |
+| **API 3 (Pool C - FR-14)** | `GET/POST/PUT/DELETE /api/categories` | 38 | 38 (38 V / 0 I) | 6 | **44** |
+| **TỔNG CỘNG TEST SUITE** | **3 Phân hệ hoàn chỉnh** | **112** | **112 (108 V / 4 I)** | **19** | **131** |
+
+
 
