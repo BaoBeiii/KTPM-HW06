@@ -134,10 +134,12 @@ Tôi xin cam đoan và tuyên bố minh bạch về việc sử dụng công c�
   2. Sinh sơ bộ bộ ca kiểm thử biên và phân vùng tương đương cho 3 API.
   3. Gợi ý cú pháp Javascript cho Postman Pre-request và Test scripts.
 - **Cam kết trách nhiệm:** 100% ca kiểm thử, các kịch bản kiểm thử mở rộng (BFLA, Price Tampering, Concurrency Overselling), việc phân tích mã nguồn SUT, xác thực lỗi, thực thi Newman và xây dựng pipeline CI/CD đều do sinh viên trực tiếp định hướng, kiểm soát và thẩm định toàn diện.
-- **Nhật ký AI Audit chi tiết:**
-  - [ai-audit/api-01/001-fr02-generation-audit.md](./ai-audit/api-01/001-fr02-generation-audit.md)
-  - [ai-audit/api-02/001-fr08-generation-audit.md](./ai-audit/api-02/001-fr08-generation-audit.md)
-  - [ai-audit/api-03/001-fr14-generation-audit.md](./ai-audit/api-03/001-fr14-generation-audit.md)
+- **Báo cáo kiểm toán AI tổng hợp (Master AI Audit):** [AI_AUDIT_REPORT.md](./AI_AUDIT_REPORT.md)
+- **Nhật ký AI Audit chi tiết từng thành phần:**
+  - Tổng quan & Chiến lược: [`ai-audit/000-planning-session.md`](./ai-audit/000-planning-session.md), [`ai-audit/001-phase1-setup.md`](./ai-audit/001-phase1-setup.md), [`ai-audit/002-phase2-strategy.md`](./ai-audit/002-phase2-strategy.md)
+  - 3 API Testing Pipelines: [`ai-audit/api-01/001-fr02-generation-audit.md`](./ai-audit/api-01/001-fr02-generation-audit.md), [`ai-audit/api-02/001-fr08-generation-audit.md`](./ai-audit/api-02/001-fr08-generation-audit.md), [`ai-audit/api-03/001-fr14-generation-audit.md`](./ai-audit/api-03/001-fr14-generation-audit.md)
+  - CI/CD, Issues & Agent Skill: [`ai-audit/003-phase6-newman-consolidation.md`](./ai-audit/003-phase6-newman-consolidation.md), [`ai-audit/004-phase7-github-issues.md`](./ai-audit/004-phase7-github-issues.md), [`ai-audit/005-phase8-cicd-pipeline.md`](./ai-audit/005-phase8-cicd-pipeline.md), [`ai-audit/006-phase9-agent-skill.md`](./ai-audit/006-phase9-agent-skill.md), [`ai-audit/007-phase10-final-report.md`](./ai-audit/007-phase10-final-report.md)
+
 
 ---
 

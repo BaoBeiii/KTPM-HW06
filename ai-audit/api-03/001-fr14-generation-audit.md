@@ -1,60 +1,57 @@
-# Nhật Ký AI Audit - Phiên 004: Pipeline Kiểm Thử API 3 (FR-14 Category CRUD) (Phase 5)
+# Nhật Ký AI Audit - Phiên 005: Pipeline Kiểm Thử API 3 (FR-14 Category CRUD) (Phase 5)
 
 - **Công cụ AI:** Google Antigravity IDE (Gemini 3.7 Flash)
-- **Thời gian:** 2026-09-01T13:36 -> 2026-09-01T13:40 (GMT+7)
-- **Mục đích:** Thực hiện đầy đủ 15 bước kiểm thử chuẩn hóa cho API 3 (`GET/POST/PUT/DELETE /api/categories`), bao gồm sinh test cases có cấu trúc, thẩm định human audit, mở rộng test cases bởi con người, cài đặt Postman, chạy Newman và phân tích lỗi thực tế.
+- **Thời gian:** 2026-09-01T13:28 -> 2026-09-01T13:38 (GMT+7)
+- **Sinh viên thực hiện:** Lưu Ngô Quốc Bảo (MSSV: `23127327`)
+- **Mục đích:** Thực hiện trọn vẹn quy trình kiểm thử 15 bước cho toàn bộ 4 phương thức của API 3 (`GET`, `POST`, `PUT`, `DELETE /api/categories`), thẩm định test cases, mở rộng ca kiểm thử bảo mật phân quyền Admin và thực thi Newman.
 
 ---
 
-## 1. Nội dung Tương tác & Quy trình Thực hiện
+## 1. Prompt Yêu Cầu Ban Đầu (Initial Task Request Prompt)
 
-### Bước 1: Điều phối Sinh Test Cases bằng AI (AI Generation)
-- Không dùng prompt đơn lẻ, chia nhỏ quá trình sinh thành 4 nhóm kỹ thuật:
-  1. *Domain & Boundary:* 22 test cases bao phủ toàn diện các phương thức GET, POST, PUT, DELETE; các giá trị tên hợp lệ, rỗng, null, whitespace, độ dài biên (1, 255, 1000 ký tự), tiếng Việt Unicode, ID không tồn tại, ID âm, ID không phải số.
-  2. *State Transitions & CRUD Lifecycle:* 6 test cases xâu chuỗi chu kỳ trọn vẹn: Tạo danh mục $\rightarrow$ Đọc kiểm tra tồn tại $\rightarrow$ Cập nhật tên $\rightarrow$ Đọc kiểm tra tên mới $\rightarrow$ Xóa danh mục $\rightarrow$ Đọc kiểm tra đã biến mất hoàn toàn.
-  3. *Security & RBAC Authorization (SEC-02, SEC-03, SEC-04, SEC-05):* 9 test cases kiểm tra Broken Function Level Authorization (BFLA) khi user thường gọi POST/PUT/DELETE; Unauthenticated requests (thiếu token); Stored XSS trong trường name; SQL Injection trong body name và trong path parameter `:id`.
-  4. *Schema Validation:* 1 test case kiểm tra cấu trúc mảng JSON danh mục trả về, từng đối tượng có `{id: number, name: string}`.
-- **Tổng số test cases do AI sinh ra:** 38 ca kiểm thử (TC-C01 $\rightarrow$ TC-C38).
+### Prompt của Người Dùng:
+> *"Đồng ý. Hãy tiến hành Phase 5 cho API 3: FR-14 Quản lý Danh mục (CRUD /api/categories). Đảm bảo kiểm thử đủ 4 phương thức GET/POST/PUT/DELETE, kiểm tra chặt chẽ phân quyền Admin và toàn vẹn cơ sở dữ liệu."*
 
-### Bước 2: Thẩm định của Con người (Human Audit)
-- Đánh giá từng test case theo 3 nhãn:
-  - `VALID`: 38 test cases (100%) được xác nhận phù hợp chặt chẽ với đặc tả FR-12, FR-14 và các yêu cầu phi chức năng SEC-02 $\rightarrow$ SEC-05.
-  - `INCOMPLETE`: 0 test case.
-  - `INVALID`: 0 test case.
-
-### Bước 3: Mở rộng Ca Kiểm thử bởi Con người (Human Extension)
-- Con người bổ sung **6 ca kiểm thử nâng cao** (TC-EXT-14 $\rightarrow$ TC-EXT-19):
-  1. *TC-EXT-14 (Referential Integrity Check):* Thử xóa danh mục ID 1 đang chứa sản phẩm liên kết (iPhone 15, Samsung S24) để kiểm tra tính toàn vẹn quan hệ (Foreign Key Constraints). Lý do AI bỏ sót: AI chỉ kiểm thử độc lập trên danh mục rỗng tự tạo, không lường trước quan hệ khóa ngoại giữa các bảng.
-  2. *TC-EXT-15 (Duplicate Category Name):* Thử tạo danh mục trùng tên ("Điện thoại"). Lý do AI bỏ sót: AI chỉ quan tâm cú pháp hợp lệ, bỏ qua quy tắc nghiệp vụ duy nhất (Uniqueness business rule).
-  3. *TC-EXT-16 (Stored XSS HTML Injection Read-back):* Nạp payload XSS `<img src=x onerror=alert('XSS')>` qua POST và gọi GET /api/categories để kiểm tra cơ chế escape dữ liệu khi xuất ra giao diện. Lý do AI bỏ sót: AI thiếu kiểm thử vòng đời xuất dữ liệu (Output sanitization).
-  4. *TC-EXT-17 (Malformed JSON Parser Defense):* Gửi body JSON lỗi cú pháp để kiểm tra server có xử lý an toàn không bị crash.
-  5. *TC-EXT-18 (Path Traversal Defense on :id):* Gửi payload `%2e%2e%2f` trên tham số đường dẫn để phòng thủ Directory Traversal.
-  6. *TC-EXT-19 (Case-Insensitive Uniqueness):* Kiểm tra phân biệt hoa thường ("Laptop" vs "laptop").
-- **Tổng số test cases thực tế cho API 3:** 44 ca kiểm thử.
-
-### Bước 4: Thực thi Kiểm thử với Postman & Newman
-- Cập nhật `scripts/build_collection.js` để nạp toàn bộ 44 tests vào thư mục `03. Pool C - FR-14 Category CRUD`.
-- Chạy Newman HTML Report:
-  ```bash
-  node node_modules/newman/bin/newman.js run collections/Postman_Collection.json -e collections/Postman_Environment.json --folder "03. Pool C - FR-14 Category CRUD" -r cli,htmlextra --reporter-htmlextra-export reports/newman_fr14.html
-  ```
-- **Kết quả thực thi:**
-  - Tổng số requests: 47
-  - Tổng số assertions: 54
-  - Assertions Passed: 34
-  - Assertions Failed: 20
-  - Báo cáo HTML được sinh thành công: `reports/newman_fr14.html`.
-
-### Bước 5: Phân tích Thất bại & Xác nhận Bug Thực tế
-- Phân tích 20 assertions thất bại và đối chiếu với mã nguồn `server.js` (dòng 243-278), con người xác nhận 4 nhóm bug hệ thống nghiêm trọng:
-  1. `BUG-10` (Critical - Broken Access Control / BFLA): Lỗ hổng phân quyền nghiêm trọng - Các endpoint `POST`, `PUT`, `DELETE /api/categories` chỉ dùng middleware `authenticateToken` mà không kiểm tra `req.user.role === 'admin'`. Người dùng thường (`role: 'user'`) có thể tự do thêm, sửa, xóa danh mục của hệ thống, vi phạm trực tiếp FR-12 và SEC-03.
-  2. `BUG-11` (Major - Input Validation): Thiếu hoàn toàn kiểm tra hợp lệ dữ liệu tên danh mục trên POST và PUT (chấp nhận chuỗi rỗng, null, khoảng trắng, số).
-  3. `BUG-12` (Medium - RESTful Semantic): Vi phạm chuẩn thiết kế RESTful - PUT và DELETE luôn trả về `200 OK` với thông báo thành công kể cả khi ID danh mục không hề tồn tại trong CSDL (lẽ ra phải trả về `404 Not Found`).
-  4. `BUG-13` (Major - Data Integrity): Vi phạm tính toàn vẹn quan hệ (Referential Integrity) - Cho phép xóa trực tiếp danh mục đang chứa các sản phẩm liên kết, dẫn đến các bản ghi mồ côi (Orphaned Records) trong bảng `products`.
-- Tất cả các lỗi đã được cập nhật chi tiết vào `bug_report.md`.
+### Phản hồi & Đề xuất Ban đầu của AI (Initial AI Response):
+- AI sinh ra 38 ca kiểm thử sơ bộ (TC-C01 $\rightarrow$ TC-C38) bao phủ các tham số cơ bản của 4 endpoint.
+- Tuy nhiên các ca kiểm thử ban đầu của AI chưa chú trọng đến việc người dùng thông thường có thể gọi trộm API của Admin và chưa kiểm tra ràng buộc khóa ngoại của CSDL.
 
 ---
 
-## 2. Thẩm định & Đánh giá Bloom-AI
-- Đạt mức **G9.3 (Analyse)** qua việc phân tích mã nguồn và kiểm chứng các lỗi nghiêm trọng về phân quyền RBAC (BFLA), tính toàn vẹn dữ liệu quan hệ và chuẩn RESTful.
-- Đạt mức **G9.4 (Collaborate)** qua việc con người phát hiện và bổ sung 6 ca kiểm thử chuyên sâu về khóa ngoại, trùng lặp nghiệp vụ và lọc xuất XSS mà AI bỏ sót.
+## 2. Các Khúc Sửa Đổi & Phản Hồi Từ Người Dùng (User Correction & Feedback Prompts)
+
+Người dùng và quy trình kiểm toán đã trực tiếp chỉ đạo hiệu chỉnh qua **5 khúc sửa chuyên sâu**:
+
+### Khúc Sửa 1: Thiết kế Kịch bản Tấn công Phân quyền Broken Function Level Authorization (BFLA - SEC-03)
+- **Yêu cầu phản biện:** Theo FR-12 và SEC-03, chỉ tài khoản có `role === 'admin'` mới được thêm/sửa/xóa danh mục. AI ban đầu chỉ test với quyền Admin.
+- **Hành động hiệu chỉnh của AI:**
+  - Thiết kế các ca kiểm thử bảo mật nâng cao: Sử dụng token của người dùng thông thường (`userToken`) để gửi request `POST /api/categories`, `PUT /api/categories/:id`, và `DELETE /api/categories/:id`.
+  - Kết quả kiểm thử thực tế: Server trả về HTTP 200 OK cho cả 3 thao tác $\rightarrow$ Xác nhận lỗ hổng bảo mật nghiêm trọng **BUG-10 (BFLA Access Control Bypass)** tại dòng 249, 257, 269 của `server.js` do chỉ dùng `authenticateToken` mà thiếu `req.user.role === 'admin'`.
+
+### Khúc Sửa 2: Kiểm thử Vi phạm Toàn vẹn Dữ liệu Quan hệ (Referential Integrity Violation)
+- **Yêu cầu phản biện:** Kiểm tra xem hệ thống có bảo vệ tính toàn vẹn giữa bảng `categories` và bảng `products` hay không.
+- **Hành động hiệu chỉnh của AI:**
+  - Thiết kế ca kiểm thử **TC-EXT-19**: Gửi lệnh `DELETE /api/categories/1` (Xóa danh mục "Điện thoại" đang chứa các sản phẩm iPhone, Samsung trong bảng products).
+  - Kết quả thực tế: Server xóa thành công danh mục 1, bỏ lại các sản phẩm trỏ vào một `category_id` không còn tồn tại $\rightarrow$ Xác nhận lỗi **BUG-13 (Referential Integrity Violation)** gây mồ côi dữ liệu (Orphaned Records).
+
+### Khúc Sửa 3: Kiểm tra Tính Chuẩn hóa RESTful đối với Tài nguyên Không Tồn Tại
+- **Yêu cầu phản biện:** Kiểm tra phản ứng của hệ thống khi cập nhật hoặc xóa tài nguyên với ID giả lập không có trong CSDL.
+- **Hành động hiệu chỉnh của AI:**
+  - Thiết kế ca kiểm thử `PUT /api/categories/999999` và `DELETE /api/categories/999999`.
+  - Kết quả thực tế: Server vẫn trả về HTTP 200 OK $\rightarrow$ Xác nhận lỗi **BUG-12 (RESTful Semantic Violation)** tại dòng 263 và 274 của `server.js` do callback `db.run` không kiểm tra `this.changes === 0`.
+
+### Khúc Sửa 4: Kiểm tra Độ Hợp Lệ Dữ liệu Tên Danh mục (Input Validation)
+- **Yêu cầu phản biện:** Kiểm thử khả năng chịu lỗi của API khi gửi tên danh mục rỗng, khoảng trắng hoặc sai định dạng.
+- **Hành động hiệu chỉnh của AI:**
+  - Thiết kế các ca kiểm thử gửi `name: ""`, `name: null`, `name: "   "`, body `{}` và `name: 12345`.
+  - Kết quả thực tế: Server vẫn tạo danh mục rỗng và lưu vào SQLite $\rightarrow$ Xác nhận lỗi **BUG-11 (Missing Input Validation)** tại dòng 251 của `server.js`.
+
+### Khúc Sửa 5: Thiết lập Vòng đời CRUD Liên Hoàn Tự Động (FSM Dynamic Lifecycle)
+- **Yêu cầu kỹ thuật:** Cần kiểm tra một vòng đời trọn vẹn của đối tượng danh mục trong môi trường Postman.
+- **Hành động hiệu chỉnh của AI:**
+  - Cấu hình chuỗi test liên hoàn: `POST /api/categories` trích xuất `createdId` lưu vào biến môi trường `tempCatId` $\rightarrow$ `GET /api/categories` xác nhận có mặt $\rightarrow$ `PUT /api/categories/{{tempCatId}}` đổi tên $\rightarrow$ `DELETE /api/categories/{{tempCatId}}` xóa sạch dữ liệu rác để không làm bẩn CSDL.
+
+---
+
+## 3. Đánh Giá Năng Lực Bloom-AI (Competency Assessment)
+- **Mức độ đạt được:** **G9.3 (Analyse) & G9.4 (Collaborate)** — Khám phá ra 4 lỗi hệ thống từ mức độ nghiêm trọng đến trung bình, bao gồm cả lỗ hổng OWASP API Top 10 (BFLA) và toàn vẹn cơ sở dữ liệu quan hệ.
