@@ -52,8 +52,9 @@ Theo yêu cầu nghiêm ngặt của đề tài HW06: *"Provide two sample commi
 - **Mục đích:** Chứng minh pipeline hoạt động hoàn hảo từ khâu dựng môi trường, khởi động backend SUT, kết nối CSDL, gửi header xác thực `X-Student-Id: 23127327`, thực thi các bài kiểm tra chấp nhận (Health Check & Connectivity Smoke Tests) và xuất báo cáo thành công 100%.
 - **Lệnh thực thi trong CI:** `npm run test:ci:pass`
 - **Kết quả:** Exit code 0, tất cả assertions đạt kết quả PASS (màu xanh lá trên GitHub Actions).
-- **Mã Commit:** `31cf310` (hoặc commit mới) — `ci: restore CI workflow to passing status (pipeline pass verification)`
-- **Trạng thái GitHub Actions:** **success ✅**
+- **Mã Commit:** `3b3dad5` — `ci: restore CI workflow to passing status (pipeline pass verification)`
+- **GitHub Actions Run ID:** [33480707803](https://github.com/BaoBeiii/KTPM-HW06/actions/runs/33480707803) (Trạng thái: **success ✅**)
+
 
 
 
