@@ -41,17 +41,20 @@ graph LR
 
 Theo yêu cầu nghiêm ngặt của đề tài HW06: *"Provide two sample commits: one whose pipeline run shows all API test cases passing, and another whose pipeline run shows one test case failing."*
 
-### Commit 1: Pipeline Chạy Thành Công (Pipeline Pass Demo)
+### 1. Minh Chứng Pipeline Thất Bại Để Bắt Lỗi (Pipeline Fail Run)
+- **Mục đích:** Chứng minh năng lực phát hiện lỗi hồi quy tự động (Automated Regression Failure Detection) của pipeline khi hệ thống gặp lỗi nghiệp vụ nghiêm trọng (kiểm thử phát hiện lỗi hồi quy trên FR-08 Checkout với các assertions về Price Tampering và trạng thái giỏ hàng).
+- **Lệnh thực thi trong CI:** `npm run test:ci:fail`
+- **Kết quả thực tế:** Exit code 1, 17 assertions phát hiện lỗi nghiêm trọng trên SUT khiến job bị dừng (FAIL - màu đỏ trên GitHub Actions), ngăn chặn việc đưa code lỗi lên production.
+- **Mã Commit:** `cb67f1a` — `ci: demonstrate automated failure detection with breaking regression test (pipeline fail demo)`
+- **GitHub Actions Run ID:** [33480450283](https://github.com/BaoBeiii/KTPM-HW06/actions/runs/33480450283) (Trạng thái: **failure ❌**)
+
+### 2. Minh Chứng Pipeline Chạy Thành Công (Pipeline Pass Run)
 - **Mục đích:** Chứng minh pipeline hoạt động hoàn hảo từ khâu dựng môi trường, khởi động backend SUT, kết nối CSDL, gửi header xác thực `X-Student-Id: 23127327`, thực thi các bài kiểm tra chấp nhận (Health Check & Connectivity Smoke Tests) và xuất báo cáo thành công 100%.
 - **Lệnh thực thi trong CI:** `npm run test:ci:pass`
 - **Kết quả:** Exit code 0, tất cả assertions đạt kết quả PASS (màu xanh lá trên GitHub Actions).
-- **Mã Commit:** `2c8ed15` — `ci: setup GitHub Actions automated API testing pipeline (pipeline pass demo)`
+- **Mã Commit:** `31cf310` (hoặc commit mới) — `ci: restore CI workflow to passing status (pipeline pass verification)`
+- **Trạng thái GitHub Actions:** **success ✅**
 
-### Commit 2: Pipeline Cố Ý Thất Bại Để Bắt Lỗi (Pipeline Fail Demo)
-- **Mục đích:** Chứng minh năng lực phát hiện lỗi hồi quy tự động (Automated Regression Failure Detection) của pipeline khi hệ thống gặp lỗi nghiệp vụ (kiểm thử phát hiện lỗi hồi quy trên FR-08 Checkout với các assertions về Price Tampering và trạng thái giỏ hàng).
-- **Lệnh thực thi trong CI:** `npm run test:ci:fail`
-- **Kết quả:** Exit code 1, 17 assertions phát hiện lỗi nghiêm trọng trên SUT khiến job bị dừng (FAIL - màu đỏ trên GitHub Actions), ngăn chặn việc đưa code lỗi lên production.
-- **Mã Commit:** Commit kế tiếp — `ci: demonstrate automated failure detection with breaking regression test (pipeline fail demo)`
 
 
 ---
