@@ -126,7 +126,8 @@ Dưới đây là **6 ca kiểm thử chuyên sâu** do con người bổ sung m
 
 ## 2.2. Các Ca Kiểm Thử Mở Rộng Do Con Người Thiết Kế (Human Extensions)
 
-Dưới đây là **6 ca kiểm thử chuyên sâu** do con người bổ sung mà AI ban đầu bỏ sót:
+Dưới đây là **7 ca kiểm thử chuyên sâu** do con người bổ sung mà AI ban đầu bỏ sót:
+
 
 | Test ID | Tên ca kiểm thử mở rộng | Request Body / Kịch bản thực thi | Kết quả mong đợi theo Đặc tả | Lý do AI bỏ sót (Why AI Missed It) |
 | :--- | :--- | :--- | :--- | :--- |

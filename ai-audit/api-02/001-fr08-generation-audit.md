@@ -25,14 +25,16 @@
   - `INVALID`: 0 test case.
 
 ### Bước 3: Mở rộng Ca Kiểm thử bởi Con người (Human Extension)
-- Con người bổ sung **6 ca kiểm thử nâng cao** (TC-EXT-07 $\rightarrow$ TC-EXT-12):
+- Con người bổ sung **7 ca kiểm thử nâng cao** (TC-EXT-07 $\rightarrow$ TC-EXT-13):
   1. *TC-EXT-07 (Free Order Exploit):* Client cố tình gửi `total_amount = 0` khi giỏ hàng có giá trị cao. Lý do AI bỏ sót: AI chỉ test số ngẫu nhiên, không nghĩ đến vector tấn công mua hàng 0 đồng.
   2. *TC-EXT-08 (Cart State Persistence Check):* Chuỗi 3 requests liên hoàn xác minh giỏ hàng bị xóa sạch sau checkout. Lý do AI bỏ sót: AI kiểm thử đơn lẻ từng endpoint.
   3. *TC-EXT-09 (BOLA/IDOR Injected user_id):* Gửi kèm `user_id: 9999` trong body checkout để xem server có gán đơn cho người khác không.
   4. *TC-EXT-10 (Stored XSS Retrieval Check):* Kiểm tra XSS khi đọc lại danh sách đơn hàng qua `GET /api/orders/my-orders`.
   5. *TC-EXT-11 (Content-Type Tampering):* Gửi body `x-www-form-urlencoded`.
   6. *TC-EXT-12 (Concurrency / Double Submit):* Gửi 2 request checkout liên tiếp cực nhanh trên cùng giỏ hàng.
-- **Tổng số test cases thực tế cho API 2:** 42 ca kiểm thử.
+  7. *TC-EXT-13 (Overselling & Negative Stock Concurrency):* Mô phỏng 2 người dùng độc lập cùng tranh chấp thanh toán món hàng cuối cùng (khi tồn kho = 1) để kiểm tra nguy cơ bán khống và tồn kho bị giảm về âm.
+- **Tổng số test cases thực tế cho API 2:** 43 ca kiểm thử.
+
 
 ### Bước 4: Thực thi Kiểm thử với Postman & Newman
 - Cập nhật `scripts/build_collection.js` để nạp toàn bộ 42 tests vào `02. Pool B - FR-08 Checkout`.
