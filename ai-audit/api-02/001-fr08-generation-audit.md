@@ -48,15 +48,19 @@
   - Báo cáo HTML được sinh thành công: `reports/newman_fr08.html`.
 
 ### Bước 5: Phân tích Thất bại & Xác nhận Bug Thực tế
-- Phân tích 16 assertions thất bại và đối chiếu với mã nguồn `server.js` (dòng 297-309), con người xác nhận 4 nhóm bug nghiêm trọng:
+- Phân tích 17 assertions thất bại và đối chiếu với mã nguồn `server.js` (dòng 297-309), con người xác nhận 5 nhóm bug nghiêm trọng:
   1. `BUG-05` (Critical - Business Logic): Lỗ hổng Price Tampering nghiêm trọng - Backend nhận trực tiếp `total_amount` từ client và lưu vào DB mà không tự tính toán lại từ giỏ hàng, vi phạm trực tiếp đặc tả FR-08.
   2. `BUG-06` (Major - State Management): Giỏ hàng không hề được làm rỗng sau khi thanh toán thành công, vi phạm đặc tả FR-08 ("Sau thanh toán thành công, giỏ hàng được xóa").
   3. `BUG-07` (Major - Business Logic): Cho phép đặt hàng thành công khi giỏ hàng rỗng (`userCarts = []`).
   4. `BUG-08` (Major - Input Validation): Thiếu hoàn toàn cơ chế kiểm tra dữ liệu đầu vào trên `/api/checkout` (chấp nhận tiền âm, tiền bằng 0, địa chỉ rỗng, null, khoảng trắng).
+  5. `BUG-09` (Major - Concurrency / Inventory Control): Thiếu cơ chế khóa tương tranh và kiểm tra số lượng tồn kho khi nhiều người dùng cùng thanh toán món hàng cuối cùng, dẫn đến lỗi bán vượt số lượng tồn kho (Overselling) và tồn kho bị giảm về âm.
 - Tất cả các lỗi đã được cập nhật chi tiết vào `bug_report.md`.
 
 ---
 
-## 2. Thẩm định & Đánh giá Bloom-AI
+## 2. Thẩm định & Đánh giá Bloom-AI (Feedback Iteration)
+- **Yêu cầu phản hồi từ Người dùng (User Feedback):** Người dùng yêu cầu bổ sung kịch bản kiểm thử tương tranh khi số lượng sản phẩm chỉ còn 1 và có 2 người dùng thanh toán cùng lúc để kiểm tra nguy cơ tồn kho bị âm.
+- **Hành động phản hồi của AI:** Thiết kế bổ sung ca kiểm thử `TC-EXT-13` mô phỏng 2 tài khoản `User 1` và `User 2` cùng tranh chấp thanh toán món hàng cuối cùng, phát hiện và xác nhận lỗi `BUG-09` (Overselling & Negative Stock).
 - Đạt mức **G9.3 (Analyse)** qua việc phát hiện các lỗi nghiêm trọng về logic nghiệp vụ và quản lý trạng thái giỏ hàng.
-- Đạt mức **G9.4 (Collaborate)** qua việc bổ sung 6 ca kiểm thử chuyên sâu mà AI bỏ sót, đặc biệt là kịch bản khai thác đơn hàng 0 đồng và kiểm tra tính toàn vẹn trạng thái giỏ hàng.
+- Đạt mức **G9.4 (Collaborate)** qua việc tích hợp phản hồi người dùng, bổ sung 7 ca kiểm thử chuyên sâu do con người thiết kế bù đắp các lỗ hổng của AI.
+

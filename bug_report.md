@@ -138,3 +138,25 @@
 - **Kết quả thực tế (Actual Result):** Trả về `200 OK` và lưu giá trị âm cùng địa chỉ rỗng vào CSDL.
 - **Kết quả mong đợi (Expected Result):** Trả về `400 Bad Request` với thông báo lỗi cụ thể cho từng trường không hợp lệ.
 
+---
+
+### BUG-09: Lỗ hổng Overselling & Tồn kho âm khi kiểm thử tương tranh (Concurrency Race Condition)
+- **Mã lỗi:** `BUG-09`
+- **API bị ảnh hưởng:** `POST /api/checkout` (FR-08)
+- **Mức độ nghiêm trọng:** `Major (Concurrency / Inventory Control Flaw)`
+- **Mô tả:** Khi một sản phẩm chỉ còn số lượng bằng 1 và có 2 người dùng (`User 1` và `User 2`) cùng đưa sản phẩm đó vào giỏ hàng và đồng thời thực hiện thanh toán (`POST /api/checkout`):
+  - Hệ thống không có cơ chế khóa tương tranh (Pessimistic/Optimistic Locking) hoặc Atomic Transaction để trừ tồn kho.
+  - Cả 2 người dùng đều thanh toán thành công và nhận được HTTP `200 OK` kèm `orderId` riêng biệt.
+  - Hệ thống bán vượt quá số lượng hàng có sẵn (Overselling), khiến cho nếu hệ thống có trừ kho thì số lượng tồn kho sẽ bị âm (`stock = 1 - 2 = -1`), gây thiệt hại nghiêm trọng cho khâu vận hành và fulfillment.
+- **Nguyên nhân kỹ thuật:**
+  1. Bảng `products` trong `database.js` hoàn toàn không có trường `stock`/`quantity` để quản lý số lượng tồn kho.
+  2. Hàm `app.post("/api/checkout", ...)` trong `server.js` (dòng 297-309) chỉ thực hiện đơn thuần `INSERT INTO orders` mà không hề có truy vấn kiểm tra số lượng tồn kho hay trừ kho theo cơ chế giao dịch an toàn tương tranh (Transaction isolation).
+- **Các bước tái hiện (Steps to Reproduce):**
+  1. Đăng ký và đăng nhập 2 tài khoản riêng biệt: `User 1` (`test@eshop.com`) và `User 2` (`user2@eshop.com`).
+  2. Cả `User 1` và `User 2` đều gọi `POST /api/cart` để thêm sản phẩm ID 1 vào giỏ với `quantity = 1`.
+  3. `User 1` gửi request `POST /api/checkout` $\rightarrow$ Nhận `200 OK`.
+  4. Gần như cùng thời điểm, `User 2` gửi request `POST /api/checkout` cho cùng sản phẩm đó.
+- **Kết quả thực tế (Actual Result):** Cả 2 request đều trả về `200 OK`, hai đơn hàng độc lập được tạo ra cho cùng một món hàng duy nhất.
+- **Kết quả mong đợi (Expected Result):** Khi số lượng còn 1, chỉ người thanh toán trước được chấp nhận (`200 OK`), người thanh toán sau phải bị từ chối với mã lỗi `400 Bad Request` ("Sản phẩm đã hết hàng / Out of stock"); tồn kho không được phép giảm về âm.
+
+

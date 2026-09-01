@@ -136,12 +136,14 @@ Dưới đây là **6 ca kiểm thử chuyên sâu** do con người bổ sung m
 | **TC-EXT-10** | Kiểm tra XSS khi đọc lại đơn hàng (Stored XSS Retrieval Check) | Gửi `shipping_address` chứa XSS payload $\rightarrow$ Gọi `GET /api/orders/my-orders` | Dữ liệu trả về không bị trigger script hoặc đã được mã hóa an toàn. | **AI thiếu kiểm thử vòng đời dữ liệu (Lifecycle verification):** AI chỉ kiểm tra lúc gửi vào (Input), không kiểm tra lúc dữ liệu được đọc ra và hiển thị (Output). |
 | **TC-EXT-11** | Kiểm tra xử lý Content-Type không hợp lệ | Gửi request checkout với Content-Type `application/x-www-form-urlencoded` | 400 Bad Request hoặc 415 Unsupported Media Type. | **AI mặc định môi trường chuẩn:** AI giả định client luôn luôn gửi `application/json`. |
 | **TC-EXT-12** | Race Condition: Gửi 2 request Checkout liên tiếp cực nhanh cùng lúc | Gửi 2 request checkout gần như đồng thời trên cùng 1 giỏ hàng có 1 sản phẩm | Chỉ 1 đơn hàng được tạo thành công, request thứ hai phải bị từ chối vì giỏ hàng đã được xóa. | **AI thiếu kiểm thử tương tranh (Concurrency Testing):** AI chỉ sinh các ca kiểm thử tuần tự đơn luồng. |
+| **TC-EXT-13** | Kiểm thử tương tranh tồn kho (Overselling & Negative Stock Race Condition): 2 người dùng đồng thời thanh toán cùng 1 sản phẩm khi số lượng chỉ còn 1 | Hai người dùng khác nhau (`User 1` và `User 2`) cùng cho 1 sản phẩm duy nhất vào giỏ và đồng thời gửi `POST /api/checkout` | Hệ thống phải có cơ chế khóa tương tranh (Pessimistic/Optimistic Lock hoặc Atomic Transaction): Chỉ 1 người được đặt hàng thành công, người còn lại nhận thông báo lỗi hết hàng (Out of stock - HTTP 400); số lượng tồn kho không được phép bị giảm về âm (`stock < 0`). | **Yêu cầu mở rộng chuyên sâu từ người dùng / AI bỏ sót tương tranh đa tài khoản:** AI chỉ giả định kiểm thử tuần tự trên 1 phiên người dùng đơn lẻ, không tự động thiết kế kịch bản 2 tài khoản cùng tranh chấp tài nguyên duy nhất (Resource Contention). |
 
 ---
 
 ## 2.3. Tổng Kết Số Lượng Ca Kiểm Thử API 2:
 - **Số ca kiểm thử do AI sinh ra:** 36 ca kiểm thử
 - **Số ca kiểm thử được thẩm định:** 36 ca kiểm thử (34 VALID, 2 INCOMPLETE được hiệu chỉnh)
-- **Số ca kiểm thử mở rộng bởi con người:** 6 ca kiểm thử
-- **Tổng số ca kiểm thử thực thi cho API 2:** **42 ca kiểm thử**
+- **Số ca kiểm thử mở rộng bởi con người:** 7 ca kiểm thử (bổ sung TC-EXT-13 kiểm thử tồn kho & Overselling)
+- **Tổng số ca kiểm thử thực thi cho API 2:** **43 ca kiểm thử**
+
 

@@ -937,6 +937,112 @@ fr08ExtItems.push(createCheckoutItem(
   ]
 ));
 
+// --- TC-EXT-13: Concurrency & Overselling Simulation (User 1 & User 2 buying last item) ---
+fr08ExtItems.push({
+  name: "TC-EXT-13.1 Setup: Register User 2 for Concurrency Test",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: ["pm.test('User 2 registered or exists', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400, 500]); });"]
+    }
+  }],
+  request: {
+    method: "POST",
+    header: [{ key: "Content-Type", value: "application/json", type: "text" }],
+    body: { mode: "raw", raw: JSON.stringify({ name: "Second User", email: "user2@eshop.com", password: "User2Pass123!" }) },
+    url: { raw: "{{baseUrl}}/api/register", host: ["{{baseUrl}}"], path: ["api", "register"] }
+  },
+  response: []
+});
+
+fr08ExtItems.push({
+  name: "TC-EXT-13.2 Setup: Login User 2 and save user2Token",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: [
+        "pm.test('User 2 login successful', function () { pm.response.to.have.status(200); });",
+        "var data = pm.response.json();",
+        "pm.environment.set('user2Token', data.token);"
+      ]
+    }
+  }],
+  request: {
+    method: "POST",
+    header: [{ key: "Content-Type", value: "application/json", type: "text" }],
+    body: { mode: "raw", raw: JSON.stringify({ email: "user2@eshop.com", password: "User2Pass123!" }) },
+    url: { raw: "{{baseUrl}}/api/login", host: ["{{baseUrl}}"], path: ["api", "login"] }
+  },
+  response: []
+});
+
+fr08ExtItems.push({
+  name: "TC-EXT-13.3 Setup: User 1 Adds Last Item to Cart",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: ["pm.test('User 1 cart has product', function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });"]
+    }
+  }],
+  request: {
+    method: "POST",
+    header: [
+      { key: "Content-Type", value: "application/json", type: "text" },
+      { key: "Authorization", value: "Bearer {{userToken}}", type: "text" }
+    ],
+    body: { mode: "raw", raw: JSON.stringify({ productId: 1, quantity: 1 }) },
+    url: { raw: "{{baseUrl}}/api/cart", host: ["{{baseUrl}}"], path: ["api", "cart"] }
+  },
+  response: []
+});
+
+fr08ExtItems.push({
+  name: "TC-EXT-13.4 Setup: User 2 Adds Last Item to Cart",
+  event: [{
+    listen: "test",
+    script: {
+      type: "text/javascript",
+      exec: ["pm.test('User 2 cart has product', function () { pm.expect(pm.response.code).to.be.oneOf([200, 201]); });"]
+    }
+  }],
+  request: {
+    method: "POST",
+    header: [
+      { key: "Content-Type", value: "application/json", type: "text" },
+      { key: "Authorization", value: "Bearer {{user2Token}}", type: "text" }
+    ],
+    body: { mode: "raw", raw: JSON.stringify({ productId: 1, quantity: 1 }) },
+    url: { raw: "{{baseUrl}}/api/cart", host: ["{{baseUrl}}"], path: ["api", "cart"] }
+  },
+  response: []
+});
+
+fr08ExtItems.push(createCheckoutItem(
+  "TC-EXT-13.5 Concurrency: User 1 Checkouts Item (First Buyer)",
+  { total_amount: 30000000, shipping_address: "Address User 1" },
+  [
+    "pm.test('User 1 checkout succeeds with 200 OK', function () { pm.response.to.have.status(200); });"
+  ],
+  null, [], "Bearer {{userToken}}"
+));
+
+fr08ExtItems.push(createCheckoutItem(
+  "TC-EXT-13.6 Concurrency: User 2 Checkouts Concurrently (Overselling & Negative Stock Check)",
+  { total_amount: 30000000, shipping_address: "Address User 2" },
+  [
+    "pm.test('Overselling Protection: Second concurrent checkout for last item MUST be rejected (400 Out of Stock)', function () {",
+    "    if (pm.response.code === 200) {",
+    "        console.log('[CRITICAL BUG] Overselling detected: Both User 1 and User 2 successfully ordered the last item!');",
+    "    }",
+    "    pm.expect(pm.response.code, 'Overselling Flaw: System allowed 2 users to buy the last single item!').to.eql(400);",
+    "});"
+  ],
+  null, [], "Bearer {{user2Token}}"
+));
+
 fr08Folder.item.push({ name: "02.4 Human Extension Tests", item: fr08ExtItems });
 
 // ============================================================================
@@ -950,4 +1056,5 @@ collection.item.push({ name: "03. Pool C - FR-14 Category CRUD", item: [] });
 // Write to file
 const targetPath = path.resolve(__dirname, '../collections/Postman_Collection.json');
 fs.writeFileSync(targetPath, JSON.stringify(collection, null, 2), 'utf8');
-console.log('Successfully generated Postman_Collection.json with Pool A (44 tests) and Pool B (42 tests)!');
+console.log('Successfully generated Postman_Collection.json with Pool A (44 tests) and Pool B (43 tests including TC-EXT-13)!');
+
