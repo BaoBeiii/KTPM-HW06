@@ -43,9 +43,10 @@ jobs:
             sleep 1
           done
 
-      - name: Run Newman Automated Tests
+      - name: Run Newman Automated Tests (Demonstrating Regression Failure Detection)
         run: |
-          npm run test:ci:pass
+          npm run test:ci:fail
+
 
       - name: Upload Newman HTML Test Report Artifact
         if: always()

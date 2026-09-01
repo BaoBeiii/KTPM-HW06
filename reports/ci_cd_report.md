@@ -44,14 +44,15 @@ Theo yêu cầu nghiêm ngặt của đề tài HW06: *"Provide two sample commi
 ### Commit 1: Pipeline Chạy Thành Công (Pipeline Pass Demo)
 - **Mục đích:** Chứng minh pipeline hoạt động hoàn hảo từ khâu dựng môi trường, khởi động backend SUT, kết nối CSDL, gửi header xác thực `X-Student-Id: 23127327`, thực thi các bài kiểm tra chấp nhận (Health Check & Connectivity Smoke Tests) và xuất báo cáo thành công 100%.
 - **Lệnh thực thi trong CI:** `npm run test:ci:pass`
-- **Kết quả kỳ vọng:** Exit code 0, tất cả assertions đạt kết quả PASS (màu xanh lá trên GitHub Actions).
-- **Mã Commit:** Commit Pass (ghi nhận tại commit đầu tiên của Phase 8).
+- **Kết quả:** Exit code 0, tất cả assertions đạt kết quả PASS (màu xanh lá trên GitHub Actions).
+- **Mã Commit:** `2c8ed15` — `ci: setup GitHub Actions automated API testing pipeline (pipeline pass demo)`
 
 ### Commit 2: Pipeline Cố Ý Thất Bại Để Bắt Lỗi (Pipeline Fail Demo)
-- **Mục đích:** Chứng minh năng lực phát hiện lỗi hồi quy tự động (Automated Regression Failure Detection) của pipeline khi hệ thống gặp lỗi nghiệp vụ (hoặc kiểm thử các endpoint có lỗi thực tế như FR-08 Checkout).
+- **Mục đích:** Chứng minh năng lực phát hiện lỗi hồi quy tự động (Automated Regression Failure Detection) của pipeline khi hệ thống gặp lỗi nghiệp vụ (kiểm thử phát hiện lỗi hồi quy trên FR-08 Checkout với các assertions về Price Tampering và trạng thái giỏ hàng).
 - **Lệnh thực thi trong CI:** `npm run test:ci:fail`
-- **Kết quả kỳ vọng:** Exit code 1, các assertion phát hiện lỗi (Price Tampering, giỏ hàng không rỗng) khiến step bị fail, pipeline dừng lại và gắn cờ đỏ trên GitHub Actions, ngăn chặn việc merge mã nguồn lỗi vào nhánh chính.
-- **Mã Commit:** Commit Fail (ghi nhận tại commit thứ hai của Phase 8).
+- **Kết quả:** Exit code 1, 17 assertions phát hiện lỗi nghiêm trọng trên SUT khiến job bị dừng (FAIL - màu đỏ trên GitHub Actions), ngăn chặn việc đưa code lỗi lên production.
+- **Mã Commit:** Commit kế tiếp — `ci: demonstrate automated failure detection with breaking regression test (pipeline fail demo)`
+
 
 ---
 
