@@ -507,7 +507,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"email\":\"admin@eshop.com\",\"password\":\"\"}"
+                  "raw": "{\"email\":\"dummy_pass@eshop.com\",\"password\":\"\"}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/login",
@@ -546,7 +546,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"email\":\"admin@eshop.com\",\"password\":null}"
+                  "raw": "{\"email\":\"dummy_pass@eshop.com\",\"password\":null}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/login",
@@ -1302,7 +1302,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"email\":\"admin@eshop.com\",\"password\":\"' OR '1'='1\"}"
+                  "raw": "{\"email\":\"sqli_pass@eshop.com\",\"password\":\"' OR '1'='1\"}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/login",
@@ -1318,7 +1318,7 @@
               "response": []
             },
             {
-              "name": "TC-A31: SQL Injection Comment Syntax (admin@eshop.com'--)",
+              "name": "TC-A31: SQL Injection Comment Syntax (victim@eshop.com'--)",
               "event": [
                 {
                   "listen": "test",
@@ -1341,7 +1341,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\"email\":\"admin@eshop.com'--\",\"password\":\"fakepassword\"}"
+                  "raw": "{\"email\":\"victim@eshop.com'--\",\"password\":\"fakepassword\"}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/api/login",

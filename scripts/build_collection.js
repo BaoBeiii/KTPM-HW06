@@ -202,11 +202,11 @@ domainItems.push(createLoginItem("TC-A09: Email Not Registered in System", { ema
   "pm.test('Error message is generic without leaking user existence', function () { var data = pm.response.json(); pm.expect(data.error).to.be.a('string'); });"
 ]));
 
-domainItems.push(createLoginItem("TC-A10: Password is Empty String", { email: "admin@eshop.com", password: "" }, [
+domainItems.push(createLoginItem("TC-A10: Password is Empty String", { email: "dummy_pass@eshop.com", password: "" }, [
   "pm.test('Expect 400 Bad Request or 401 Unauthorized on empty password', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
 ]));
 
-domainItems.push(createLoginItem("TC-A11: Password is Null", { email: "admin@eshop.com", password: null }, [
+domainItems.push(createLoginItem("TC-A11: Password is Null", { email: "dummy_pass@eshop.com", password: null }, [
   "pm.test('Expect 400 Bad Request or 401 Unauthorized on null password', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });"
 ]));
 
@@ -286,10 +286,10 @@ securityItems.push(createLoginItem("TC-A29: SQL Injection in Email (' OR '1'='1)
   "pm.test('SQLi in Email must NOT result in 200 OK bypass', function () { pm.expect(pm.response.code).to.be.oneOf([400, 401]); });",
   "pm.test('No JWT token granted via SQL injection', function () { var data = pm.response.json(); pm.expect(data.token).to.be.undefined; });"
 ]));
-securityItems.push(createLoginItem("TC-A30: SQL Injection in Password (' OR '1'='1)", { email: "admin@eshop.com", password: "' OR '1'='1" }, [
+securityItems.push(createLoginItem("TC-A30: SQL Injection in Password (' OR '1'='1)", { email: "sqli_pass@eshop.com", password: "' OR '1'='1" }, [
   "pm.test('SQLi in Password must NOT bypass password check', function () { pm.response.to.have.status(401); });"
 ]));
-securityItems.push(createLoginItem("TC-A31: SQL Injection Comment Syntax (admin@eshop.com'--)", { email: "admin@eshop.com'--", password: "fakepassword" }, [
+securityItems.push(createLoginItem("TC-A31: SQL Injection Comment Syntax (victim@eshop.com'--)", { email: "victim@eshop.com'--", password: "fakepassword" }, [
   "pm.test('SQLi comment payload rejected with 401', function () { pm.response.to.have.status(401); });"
 ]));
 securityItems.push(createLoginItem("TC-A32: SQL Injection UNION SELECT Payload", { email: "test@eshop.com' UNION SELECT 1,2,3--", password: "p" }, [
