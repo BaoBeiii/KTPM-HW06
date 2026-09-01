@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "API Testing Strategy & Specification"
+    url: "https://github.com/BaoBeiii/KTPM-HW06/blob/main/api_testing_strategy.md"
+    about: "Xem tài liệu chiến lược kiểm thử và đặc tả 3 API của đề tài HW06"
+  - name: "Full Newman Execution Report"
+    url: "https://github.com/BaoBeiii/KTPM-HW06/blob/main/reports/summary.md"
+    about: "Xem tổng hợp kết quả chạy kiểm thử toàn hệ thống Newman"
