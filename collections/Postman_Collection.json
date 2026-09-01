@@ -1,0 +1,84 @@
+{
+  "info": {
+    "_postman_id": "f9b8c7d6-e5a4-4321-ba98-231273270001",
+    "name": "EShop API Testing Suite - 23127327",
+    "description": "API Testing Suite for EShop SUT - HW06 individual assignment by Luu Ngo Quoc Bao (StudentID: 23127327). Contains tests for Pool A (FR-02 Login), Pool B (FR-08 Checkout), and Pool C (FR-14 Category CRUD).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// ========================================================",
+          "// MANDATORY ANTI-AI-CHEAT REQUIREMENT (Section 6 & 11)",
+          "// Every request must carry header: X-Student-Id: {StudentID}",
+          "// ========================================================",
+          "var studentId = pm.environment.get('studentId') || '23127327';",
+          "pm.request.headers.upsert({",
+          "    key: 'X-Student-Id',",
+          "    value: studentId",
+          "});",
+          "console.log('[Anti-Cheat Evidence] Header X-Student-Id set to: ' + studentId + ' | Target: ' + pm.request.method + ' ' + pm.request.url.toString());"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "00. Environment & Health Check",
+      "item": [
+        {
+          "name": "00.1 Health Check & Connectivity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HealthCheck] Server is reachable and returns HTTP 200 OK', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('[HealthCheck] Response is a non-empty array of products', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    pm.expect(jsonData.length).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test('[AntiCheat] Request carries valid X-Student-Id header', function () {",
+                  "    pm.expect(pm.request.headers.get('X-Student-Id')).to.eql('23127327');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"]
+            },
+            "description": "Verifies that the EShop backend is up and running on port 3000, database is connected, and X-Student-Id header is automatically injected."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01. Pool A - FR-02 Login",
+      "item": []
+    },
+    {
+      "name": "02. Pool B - FR-08 Checkout",
+      "item": []
+    },
+    {
+      "name": "03. Pool C - FR-14 Category CRUD",
+      "item": []
+    }
+  ]
+}

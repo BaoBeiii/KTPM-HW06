@@ -1,0 +1,13 @@
+{
+  "name": "hw06-api-testing",
+  "version": "1.0.0",
+  "description": "API Testing Suite for EShop SUT - Student 23127327",
+  "scripts": {
+    "start:backend": "node eshop-sut/backend/server.js",
+    "test:api": "newman run collections/Postman_Collection.json -e collections/Postman_Environment.json -r cli,htmlextra --reporter-htmlextra-export reports/newman_report.html"
+  },
+  "devDependencies": {
+    "newman": "^6.2.1",
+    "newman-reporter-htmlextra": "^1.23.1"
+  }
+}

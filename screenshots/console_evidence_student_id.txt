@@ -1,0 +1,50 @@
+================================================================================
+NEWMAN EXECUTION EVIDENCE - ANTI-AI-CHEAT VERIFICATION
+================================================================================
+Student ID: 23127327
+Student Name: Lưu Ngô Quốc Bảo
+Target Host: http://localhost:3000 (Local SUT Backend)
+Timestamp: 2026-09-01T11:56:06 (GMT+7)
+
+--------------------------------------------------------------------------------
+CLI Output:
+--------------------------------------------------------------------------------
+newman
+
+EShop API Testing Suite - 23127327
+
+□ 00. Environment & Health Check
+└ 00.1 Health Check & Connectivity
+  ┌
+  │ '[Anti-Cheat Evidence] Header X-Student-Id set to: 23127327 | Target: GET {{baseUrl}}/api/products'
+  └
+  GET http://localhost:3000/api/products [200 OK, 1.24kB, 23ms]
+  √  [HealthCheck] Server is reachable and returns HTTP 200 OK
+  √  [HealthCheck] Response is a non-empty array of products
+  √  [AntiCheat] Request carries valid X-Student-Id header
+
+┌─────────────────────────┬──────────────────┬──────────────────┐
+│                         │         executed │           failed │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              iterations │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│                requests │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│            test-scripts │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│      prerequest-scripts │                1 │                0 │
+├─────────────────────────┼──────────────────┼──────────────────┤
+│              assertions │                3 │                0 │
+├─────────────────────────┴──────────────────┴──────────────────┤
+│ total run duration: 104ms                                     │
+├───────────────────────────────────────────────────────────────┤
+│ total data received: 969B (approx)                            │
+├───────────────────────────────────────────────────────────────┤
+│ average response time: 23ms [min: 23ms, max: 23ms, s.d.: 0µs] │
+└───────────────────────────────────────────────────────────────┘
+
+--------------------------------------------------------------------------------
+HTML Report Exported: reports/healthcheck_report.html
+Postman Collection: collections/Postman_Collection.json
+Postman Environment: collections/Postman_Environment.json
+================================================================================
