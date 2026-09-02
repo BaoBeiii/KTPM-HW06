@@ -157,3 +157,31 @@ Theo mục 11 Anti-AI-Cheat Constraints của đề bài:
 1. **Header định danh sinh viên:** Toàn bộ 142 requests đều được tiêm tự động header `X-Student-Id: 23127327` qua Pre-request Script. Minh chứng console log đã được ghi nhận tại [`screenshots/console_evidence_student_id.txt`](./screenshots/console_evidence_student_id.txt).
 2. **Báo cáo Newman thực tế:** Hostname kiểm thử là `http://localhost:3000` trên môi trường máy cục bộ, báo cáo HTML Extra đã được kết xuất đầy đủ tại [`reports/newman_full_suite.html`](./reports/newman_full_suite.html).
 3. **Sơ đồ kiến trúc Agent Skill:** Được sinh viên tự thiết kế kiến trúc phân tầng 5 Passes và lập sơ đồ chi tiết tại [`reports/agent_skill_design.md`](./reports/agent_skill_design.md).
+
+---
+
+## 11. Lịch Sử Git Commit Log (Section 12 Compliance)
+
+Toàn bộ quy trình thực hiện đồ án tuân thủ nghiêm ngặt quy định tại Mục 12 của đề bài: Mỗi bước và phase đều có commit độc lập tương ứng. Tệp văn bản log chi tiết: [`git_commit_log.txt`](./git_commit_log.txt).
+
+| STT | Mã Commit | Thời Gian (GMT+7) | Thông Điệp Commit (Conventional Commits) | Phase Tương Ứng |
+| :---: | :---: | :---: | :--- | :--- |
+| 18 | `186b49e` | 2026-09-01 14:32:16 | `docs(audit): format all AI audit interactions with 4 mandatory fields (tool, time, prompt, output)` | Chuẩn hóa AI Audit |
+| 17 | `0676979` | 2026-09-01 14:26:40 | `docs(audit): consolidate master AI audit report and separate initial prompts and correction iterations` | Master Audit Report |
+| 16 | `bd5a377` | 2026-09-01 14:18:34 | `docs: complete final report, AI audit declarations, and AI critique` | Phase 10: Final Report |
+| 15 | `3e4ce0a` | 2026-09-01 14:12:53 | `feat(skill): implement reusable AI-driven API test generator agent skill with design diagram and pseudocode` | Phase 9: Agent Skill |
+| 14 | `99453f5` | 2026-09-01 14:09:18 | `docs(ci): record live GitHub Actions run URLs for pass and fail runs` | Phase 8: CI/CD Links |
+| 13 | `3b3dad5` | 2026-09-01 14:08:16 | `ci: restore CI workflow to passing status (pipeline pass verification)` | Phase 8: CI Pass Demo |
+| 12 | `cb67f1a` | 2026-09-01 14:03:12 | `ci: demonstrate automated failure detection with breaking regression test (pipeline fail demo)` | Phase 8: CI Fail Demo |
+| 11 | `2c8ed15` | 2026-09-01 14:02:50 | `ci: setup GitHub Actions automated API testing pipeline (pipeline pass demo)` | Phase 8: CI Setup |
+| 10 | `aa395b2` | 2026-09-01 13:51:10 | `docs(issues): create GitHub issue templates and log 13 confirmed bug reports` | Phase 7: GitHub Issues |
+| 9 | `778d96c` | 2026-09-01 13:43:04 | `test(newman): consolidate full test suite execution and generate comprehensive HTML reports` | Phase 6: Newman Suite |
+| 8 | `c491511` | 2026-09-01 13:37:57 | `feat(api-3): complete full testing pipeline and Newman execution for FR-14 Category CRUD` | Phase 5: API 3 CRUD |
+| 7 | `4aee754` | 2026-09-01 13:09:49 | `docs(api-2): synchronize human extension count to 7 across test cases and AI audit log` | Phase 4: Sửa số lượng Ext |
+| 6 | `4db4a6c` | 2026-09-01 13:07:59 | `fix(api-2): add concurrent checkout test case for overselling and negative stock verification` | Phase 4: Test Tương Tranh |
+| 5 | `e8b2c37` | 2026-09-01 13:02:47 | `feat(api-2): complete full testing pipeline and Newman execution for FR-08 Checkout` | Phase 4: API 2 Checkout |
+| 4 | `fea87e1` | 2026-09-01 12:53:55 | `feat(api-1): complete full testing pipeline and Newman execution for FR-02 Login` | Phase 3: API 1 Login |
+| 3 | `8b10f9f` | 2026-09-01 12:29:34 | `docs: record API specification analysis and testing strategy for 3 APIs` | Phase 2: Chiến Lược |
+| 2 | `79cb45b` | 2026-09-01 11:56:38 | `chore: configure SUT backend and Postman environment with X-Student-Id` | Phase 1: Môi Trường |
+| 1 | `0826d1c` | 2026-09-01 11:50:56 | `chore: initialize project workspace and AI audit structure` | Phase 0: Khởi Tạo |
+

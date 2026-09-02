@@ -1,0 +1,107 @@
+commit 186b49e5d10227f888fdd73b1ddafdb1053c6b27
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 14:32:16 +0700
+
+    docs(audit): format all AI audit interactions with 4 mandatory fields (tool, time, prompt, output)
+
+commit 06769793a093de5be75c5aeeef83f171919eda3f
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 14:26:40 +0700
+
+    docs(audit): consolidate master AI audit report and separate initial prompts and correction iterations
+
+commit bd5a377f2f6f310956a0381379429e36729307ca
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 14:18:34 +0700
+
+    docs: complete final report, AI audit declarations, and AI critique
+
+commit 3e4ce0a3d07868448995263414404c5d91d017ed
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 14:12:53 +0700
+
+    feat(skill): implement reusable AI-driven API test generator agent skill with design diagram and pseudocode
+
+commit 99453f584dcf3f35246653e62f7455c3248a96bd
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 14:09:18 +0700
+
+    docs(ci): record live GitHub Actions run URLs for pass and fail runs
+
+commit 3b3dad5681d9409e485a0bebb3ebdf9e1ca57f1c
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 14:08:16 +0700
+
+    ci: restore CI workflow to passing status (pipeline pass verification)
+
+commit cb67f1a6c905842d36af64be002fc799f3e3beef
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 14:03:12 +0700
+
+    ci: demonstrate automated failure detection with breaking regression test (pipeline fail demo)
+
+commit 2c8ed155f0fadbd1eb1b58090c892307ce7f5b1c
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 14:02:50 +0700
+
+    ci: setup GitHub Actions automated API testing pipeline (pipeline pass demo)
+
+commit aa395b279cdaf21370c54a8fc8671643398fb460
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 13:51:10 +0700
+
+    docs(issues): create GitHub issue templates and log 13 confirmed bug reports
+
+commit 778d96c3d95068c428a7d8267423de9f6a1e4db6
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 13:43:04 +0700
+
+    test(newman): consolidate full test suite execution and generate comprehensive HTML reports
+
+commit c491511bb8f6a6dd0779506dc6a8d6ae729eb6e9
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 13:37:57 +0700
+
+    feat(api-3): complete full testing pipeline and Newman execution for FR-14 Category CRUD
+
+commit 4aee7544a3f31f3b492a374a4c62cc0e4a38482e
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 13:09:49 +0700
+
+    docs(api-2): synchronize human extension count to 7 across test cases and AI audit log
+
+commit 4db4a6c876fea652b696543b18abc317afe06405
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 13:07:59 +0700
+
+    fix(api-2): add concurrent checkout test case for overselling and negative stock verification
+
+commit e8b2c37eebcc6f93bec04c8b2b54d442a24ef3ff
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 13:02:47 +0700
+
+    feat(api-2): complete full testing pipeline and Newman execution for FR-08 Checkout
+
+commit fea87e1b0520ea777f055483145615385407cb9d
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 12:53:55 +0700
+
+    feat(api-1): complete full testing pipeline and Newman execution for FR-02 Login
+
+commit 8b10f9fc204d28a2105792c003c8aa26afa6c4cf
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 12:29:34 +0700
+
+    docs: record API specification analysis and testing strategy for 3 APIs
+
+commit 79cb45be8055b14d05b663c41988feb58e585ee3
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 11:56:38 +0700
+
+    chore: configure SUT backend and Postman environment with X-Student-Id
+
+commit 0826d1c14038ee280454437fa03efbdd9136effd
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-01 11:50:56 +0700
+
+    chore: initialize project workspace and AI audit structure
