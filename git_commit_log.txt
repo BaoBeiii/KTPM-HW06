@@ -1,3 +1,15 @@
+commit eaf74d9244ca422199d4de6d425d041ce386c54f
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-02 22:19:16 +0700
+
+    docs: embed YouTube demo video link in report header, README, and agent skill design
+
+commit 0633c56def3d39d68efe1c49ff8801d981b74ac3
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-02 22:05:24 +0700
+
+    chore: synchronize git_commit_log.txt with latest commit history
+
 commit 8f75914c2e8e1e6ac92d4db4c183a794dbee8525
 Author: BaoBeiii <23127327@student.hcmus.edu.vn>
 Date:   2026-09-02 22:05:17 +0700
