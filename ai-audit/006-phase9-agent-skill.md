@@ -4,6 +4,8 @@
 - **Thời gian:** 2026-09-01T14:12 -> 2026-09-01T14:15 (GMT+7)
 - **Sinh viên thực hiện:** Lưu Ngô Quốc Bảo (MSSV: `23127327`)
 - **Mục đích:** Thiết kế và cài đặt một Agent Skill hoàn chỉnh có khả năng phân tích đặc tả API và tự động sinh ra bộ sưu tập Postman Collection có assertions kiểm thử tự động, đáp ứng cấp độ Bloom-AI G9.5 (Create).
+- **Video Minh Họa Demo (YouTube):** [https://youtu.be/-BG54YRyEqk](https://youtu.be/-BG54YRyEqk)
+
 
 ---
 

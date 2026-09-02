@@ -433,6 +433,8 @@
 ### PHIÊN 009: THIẾT KẾ AGENT SKILL TỰ ĐỘNG SINH TEST CASES (PHASE 9)
 - **Tệp chi tiết:** [`ai-audit/006-phase9-agent-skill.md`](./ai-audit/006-phase9-agent-skill.md)
 - **Cấp độ Bloom-AI:** **G9.5 (Create)**
+- **Video Minh Họa Demo (YouTube):** [https://youtu.be/-BG54YRyEqk](https://youtu.be/-BG54YRyEqk)
+
 
 #### Tương tác 9.1: Yêu cầu thiết kế Agent Skill (Bloom-AI G9.5)
 - **Tên công cụ AI:** Google Antigravity IDE (Gemini 3.7 Flash)

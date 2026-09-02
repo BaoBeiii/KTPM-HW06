@@ -6,7 +6,9 @@
 - **Lớp / Khóa:** Kiểm thử phần mềm — HCMUS
 - **Hệ thống kiểm thử (SUT):** EShop API Backend (`http://localhost:3000`)
 - **Kho lưu trữ GitHub:** [https://github.com/BaoBeiii/KTPM-HW06](https://github.com/BaoBeiii/KTPM-HW06)
+- **Video Minh Họa Demo Agent Skill (YouTube):** [https://youtu.be/-BG54YRyEqk](https://youtu.be/-BG54YRyEqk)
 - **Cấp độ Bloom-AI cam kết:** **G9.2 (Apply) $\rightarrow$ G9.5 (Create)**
+
 
 ---
 
@@ -118,6 +120,8 @@ Toàn bộ 13 lỗi đã được lập thành các GitHub Issues chi tiết t�
   - Mã giả thuật toán chi tiết dạng khối logic chuẩn hóa.
   - Script thực thi thật CLI: `.agents/skills/api-test-generator/scripts/generator.js`.
 - **Tài liệu thiết kế chi tiết:** [`reports/agent_skill_design.md`](./reports/agent_skill_design.md).
+- **Video Minh Họa Thực Nghiệm (YouTube Demonstration):** [https://youtu.be/-BG54YRyEqk](https://youtu.be/-BG54YRyEqk)
+
 
 ---
 

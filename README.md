@@ -7,6 +7,8 @@
 - **Giảng viên hướng dẫn:** TS. Lâm Quang Vũ, TS. Trần Duy Hoàng, ThS. Trần Thị Bích Hạnh, ThS. Trương Phước Lộc, ThS. Hồ Tuấn Thanh
 - **Khoa:** Công nghệ Thông tin – Trường ĐH Khoa học Tự nhiên, ĐHQG-HCM
 - **Kho lưu trữ GitHub:** [https://github.com/BaoBeiii/KTPM-HW06](https://github.com/BaoBeiii/KTPM-HW06)
+- **Video Demo Agent Skill (YouTube):** [https://youtu.be/-BG54YRyEqk](https://youtu.be/-BG54YRyEqk)
+
 
 ---
 

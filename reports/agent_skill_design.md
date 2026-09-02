@@ -5,6 +5,8 @@
 - **Cấp độ năng lực Bloom-AI:** **G9.5 (Create)** — Thiết kế và hiện thực hóa một Agent Skill hoàn chỉnh có khả năng tự động hóa quy trình kỹ sư kiểm thử.
 - **Tên Agent Skill:** `api-test-generator`
 - **Mã nguồn Agent Skill:** [`.agents/skills/api-test-generator/`](../.agents/skills/api-test-generator/)
+- **Video Minh Họa Thực Nghiệm (YouTube Demonstration):** [https://youtu.be/-BG54YRyEqk](https://youtu.be/-BG54YRyEqk)
+
 
 ---
 
@@ -196,7 +198,9 @@ ALGORITHM RunApiTestGeneratorSkill
   ```bash
   node .agents/skills/api-test-generator/scripts/generator.js --spec eshop-sut/api_specification.md --student-id 23127327 --out collections/Generated_Collection.json
   ```
+- **Video Minh Họa Thực Nghiệm (YouTube Video):** [https://youtu.be/-BG54YRyEqk](https://youtu.be/-BG54YRyEqk)
 - **Kịch bản ghi hình Demo (YouTube Walkthrough):**
+
   1. Giới thiệu cấu trúc Agent Skill trong thư mục `.agents/skills/api-test-generator/`.
   2. Giải thích sơ đồ kiến trúc 5 tầng và mã giả thuật toán.
   3. Mở terminal, chạy lệnh sinh tự động `generator.js`.
