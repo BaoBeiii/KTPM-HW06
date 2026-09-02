@@ -1,3 +1,15 @@
+commit a0d1561d0b40104a2bee43600611d10a90eaca6f
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-02 22:29:37 +0700
+
+    feat(submission): generate PDF reports, test_cases.xlsx, openapi.yaml, and packaging scripts
+
+commit 3389825fe40ad34a76b06e56297aed055b6aa97f
+Author: BaoBeiii <23127327@student.hcmus.edu.vn>
+Date:   2026-09-02 22:19:24 +0700
+
+    chore: refresh git_commit_log.txt with YouTube link commit
+
 commit eaf74d9244ca422199d4de6d425d041ce386c54f
 Author: BaoBeiii <23127327@student.hcmus.edu.vn>
 Date:   2026-09-02 22:19:16 +0700
